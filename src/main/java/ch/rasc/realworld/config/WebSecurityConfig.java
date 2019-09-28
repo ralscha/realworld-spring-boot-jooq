@@ -4,7 +4,7 @@ import static java.util.Arrays.asList;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +23,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	private final boolean h2ConsoleEnabled;
 
-	@Value("${spring.h2.console.enabled:false}")
-	private boolean h2ConsoleEnabled;
+	private final JwtTokenFilter jwtTokenFilter;
 
-	@Autowired
-	private JwtTokenFilter jwtTokenFilter;
+	public WebSecurityConfig(@Value("${spring.h2.console.enabled:false}") boolean h2ConsoleEnabled,
+			DSLContext dsl, JwtService jwtService) {
+		this.h2ConsoleEnabled = h2ConsoleEnabled;
+		this.jwtTokenFilter = new JwtTokenFilter(dsl, jwtService);
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
