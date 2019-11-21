@@ -3,8 +3,10 @@ package ch.rasc.realworld.config;
 import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @ConfigurationProperties("app")
+@Component
 public class AppProperties {
 
 	private String jwtSecret;
