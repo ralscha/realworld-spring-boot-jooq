@@ -5,6 +5,6 @@
     "start": "newman run postman.json --delay-request 500 --global-var \"APIURL=http://localhost:8080\" --global-var \"USERNAME=test\" --global-var \"EMAIL=test@mail.com\" --global-var \"PASSWORD=password\""
   },
   "devDependencies": {
-    "newman": "4.5.1"
+    "newman": "5.2.1"
   }
 }
