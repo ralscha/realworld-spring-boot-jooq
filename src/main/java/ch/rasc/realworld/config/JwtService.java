@@ -29,16 +29,15 @@ public class JwtService {
 	}
 
 	public String toToken(long userId) {
-		return Jwts.builder().signWith(this.key).setSubject(Long.toString(userId))
-				.setExpiration(expireTimeFromNow()).compact();
+		return Jwts.builder().signWith(this.key).setSubject(Long.toString(userId)).setExpiration(expireTimeFromNow())
+				.compact();
 	}
 
 	public Long getSubFromToken(String token) {
 		try {
 			Jws<Claims> claimsJws = this.jwtParser.parseClaimsJws(token);
 			return Long.valueOf(claimsJws.getBody().getSubject());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return null;
 		}
 	}

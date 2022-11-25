@@ -32,8 +32,7 @@ public class UsersController {
 
 	private final JwtService jwtService;
 
-	public UsersController(DSLContext dsl, PasswordEncoder passwordEncoder,
-			JwtService jwtService) {
+	public UsersController(DSLContext dsl, PasswordEncoder passwordEncoder, JwtService jwtService) {
 		this.dsl = dsl;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
@@ -41,29 +40,24 @@ public class UsersController {
 
 	@SuppressWarnings("null")
 	@PostMapping("/users")
-	public ResponseEntity<?> createUser(@Valid @RequestBody RegisterParam registerParam,
-			BindingResult bindingResult) {
+	public ResponseEntity<?> createUser(@Valid @RequestBody RegisterParam registerParam, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.USERNAME.eq(registerParam.username()))
-				.fetchOne(0, int.class) == 1) {
+		if (this.dsl.selectCount().from(APP_USER).where(APP_USER.USERNAME.eq(registerParam.username())).fetchOne(0,
+				int.class) == 1) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
-		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.EMAIL.eq(registerParam.email()))
-				.fetchOne(0, int.class) == 1) {
+		if (this.dsl.selectCount().from(APP_USER).where(APP_USER.EMAIL.eq(registerParam.email())).fetchOne(0,
+				int.class) == 1) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
 		AppUserRecord newRecord = this.dsl.newRecord(APP_USER);
@@ -75,47 +69,38 @@ public class UsersController {
 		newRecord.store();
 
 		String token = this.jwtService.toToken(newRecord.getId());
-		User user = new User(newRecord.getEmail(), token, newRecord.getUsername(),
-				newRecord.getBio(), newRecord.getImage());
+		User user = new User(newRecord.getEmail(), token, newRecord.getUsername(), newRecord.getBio(),
+				newRecord.getImage());
 		return ResponseEntity.status(201).body(Map.of("user", user));
 	}
 
 	@PostMapping("/users/login")
-	public ResponseEntity<?> userLogin(@Valid @RequestBody LoginParam loginParam,
-			BindingResult bindingResult) {
+	public ResponseEntity<?> userLogin(@Valid @RequestBody LoginParam loginParam, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		var userRecord = this.dsl.selectFrom(APP_USER)
-				.where(APP_USER.EMAIL.eq(loginParam.email())).fetchOne();
-		if (userRecord != null && this.passwordEncoder.matches(loginParam.password(),
-				userRecord.getPassword())) {
+		var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.EMAIL.eq(loginParam.email())).fetchOne();
+		if (userRecord != null && this.passwordEncoder.matches(loginParam.password(), userRecord.getPassword())) {
 			String token = this.jwtService.toToken(userRecord.getId());
-			User user = new User(userRecord.getEmail(), token, userRecord.getUsername(),
-					userRecord.getBio(), userRecord.getImage());
+			User user = new User(userRecord.getEmail(), token, userRecord.getUsername(), userRecord.getBio(),
+					userRecord.getImage());
 			return ResponseEntity.ok(Map.of("user", user));
 		}
 		bindingResult.rejectValue("password", "INVALID", "invalid email or password");
-		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-				.body(Util.toError(bindingResult));
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 	}
 
 }
 
 @JsonRootName("user")
-record LoginParam(
-		@NotBlank(message = "can't be empty") @Email(
-				message = "should be an email") String email,
+record LoginParam(@NotBlank(message = "can't be empty") @Email(message = "should be an email") String email,
 		@NotBlank(message = "can't be empty") String password) {
 }
 
 @JsonRootName("user")
-record RegisterParam(
-		@NotBlank(message = "can't be empty") @Email(
-				message = "should be an email") String email,
+record RegisterParam(@NotBlank(message = "can't be empty") @Email(message = "should be an email") String email,
 		String bio, String image, @NotBlank(message = "can't be empty") String username,
 		@NotBlank(message = "can't be empty") String password) {
 }

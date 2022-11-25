@@ -3,6 +3,11 @@
  */
 package ch.rasc.realworld.db;
 
+import org.jooq.ForeignKey;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 
 import ch.rasc.realworld.db.tables.AppUser;
 import ch.rasc.realworld.db.tables.Article;
@@ -19,13 +24,6 @@ import ch.rasc.realworld.db.tables.records.CommentRecord;
 import ch.rasc.realworld.db.tables.records.FollowRecord;
 import ch.rasc.realworld.db.tables.records.TagRecord;
 
-import org.jooq.ForeignKey;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
-
 /**
  * A class modelling foreign key relationships and constraints of tables in the
  * default schema.
@@ -33,33 +31,66 @@ import org.jooq.impl.Internal;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Keys {
 
-    // -------------------------------------------------------------------------
-    // UNIQUE and PRIMARY KEY definitions
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// UNIQUE and PRIMARY KEY definitions
+	// -------------------------------------------------------------------------
 
-    public static final UniqueKey<AppUserRecord> CONSTRAINT_4 = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("CONSTRAINT_4"), new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final UniqueKey<AppUserRecord> CONSTRAINT_45 = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("CONSTRAINT_45"), new TableField[] { AppUser.APP_USER.USERNAME }, true);
-    public static final UniqueKey<AppUserRecord> CONSTRAINT_459 = Internal.createUniqueKey(AppUser.APP_USER, DSL.name("CONSTRAINT_459"), new TableField[] { AppUser.APP_USER.EMAIL }, true);
-    public static final UniqueKey<ArticleRecord> CONSTRAINT_D = Internal.createUniqueKey(Article.ARTICLE, DSL.name("CONSTRAINT_D"), new TableField[] { Article.ARTICLE.ID }, true);
-    public static final UniqueKey<ArticleRecord> CONSTRAINT_D4 = Internal.createUniqueKey(Article.ARTICLE, DSL.name("CONSTRAINT_D4"), new TableField[] { Article.ARTICLE.SLUG }, true);
-    public static final UniqueKey<ArticleFavoriteRecord> CONSTRAINT_1 = Internal.createUniqueKey(ArticleFavorite.ARTICLE_FAVORITE, DSL.name("CONSTRAINT_1"), new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.ID }, true);
-    public static final UniqueKey<ArticleTagRecord> CONSTRAINT_3 = Internal.createUniqueKey(ArticleTag.ARTICLE_TAG, DSL.name("CONSTRAINT_3"), new TableField[] { ArticleTag.ARTICLE_TAG.ID }, true);
-    public static final UniqueKey<CommentRecord> CONSTRAINT_38 = Internal.createUniqueKey(Comment.COMMENT, DSL.name("CONSTRAINT_38"), new TableField[] { Comment.COMMENT.ID }, true);
-    public static final UniqueKey<FollowRecord> CONSTRAINT_B = Internal.createUniqueKey(Follow.FOLLOW, DSL.name("CONSTRAINT_B"), new TableField[] { Follow.FOLLOW.ID }, true);
-    public static final UniqueKey<TagRecord> CONSTRAINT_1B = Internal.createUniqueKey(Tag.TAG, DSL.name("CONSTRAINT_1B"), new TableField[] { Tag.TAG.ID }, true);
-    public static final UniqueKey<TagRecord> CONSTRAINT_1BF = Internal.createUniqueKey(Tag.TAG, DSL.name("CONSTRAINT_1BF"), new TableField[] { Tag.TAG.NAME }, true);
+	public static final UniqueKey<AppUserRecord> CONSTRAINT_4 = Internal.createUniqueKey(AppUser.APP_USER,
+			DSL.name("CONSTRAINT_4"), new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final UniqueKey<AppUserRecord> CONSTRAINT_45 = Internal.createUniqueKey(AppUser.APP_USER,
+			DSL.name("CONSTRAINT_45"), new TableField[] { AppUser.APP_USER.USERNAME }, true);
+	public static final UniqueKey<AppUserRecord> CONSTRAINT_459 = Internal.createUniqueKey(AppUser.APP_USER,
+			DSL.name("CONSTRAINT_459"), new TableField[] { AppUser.APP_USER.EMAIL }, true);
+	public static final UniqueKey<ArticleRecord> CONSTRAINT_D = Internal.createUniqueKey(Article.ARTICLE,
+			DSL.name("CONSTRAINT_D"), new TableField[] { Article.ARTICLE.ID }, true);
+	public static final UniqueKey<ArticleRecord> CONSTRAINT_D4 = Internal.createUniqueKey(Article.ARTICLE,
+			DSL.name("CONSTRAINT_D4"), new TableField[] { Article.ARTICLE.SLUG }, true);
+	public static final UniqueKey<ArticleFavoriteRecord> CONSTRAINT_1 = Internal.createUniqueKey(
+			ArticleFavorite.ARTICLE_FAVORITE, DSL.name("CONSTRAINT_1"),
+			new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.ID }, true);
+	public static final UniqueKey<ArticleTagRecord> CONSTRAINT_3 = Internal.createUniqueKey(ArticleTag.ARTICLE_TAG,
+			DSL.name("CONSTRAINT_3"), new TableField[] { ArticleTag.ARTICLE_TAG.ID }, true);
+	public static final UniqueKey<CommentRecord> CONSTRAINT_38 = Internal.createUniqueKey(Comment.COMMENT,
+			DSL.name("CONSTRAINT_38"), new TableField[] { Comment.COMMENT.ID }, true);
+	public static final UniqueKey<FollowRecord> CONSTRAINT_B = Internal.createUniqueKey(Follow.FOLLOW,
+			DSL.name("CONSTRAINT_B"), new TableField[] { Follow.FOLLOW.ID }, true);
+	public static final UniqueKey<TagRecord> CONSTRAINT_1B = Internal.createUniqueKey(Tag.TAG,
+			DSL.name("CONSTRAINT_1B"), new TableField[] { Tag.TAG.ID }, true);
+	public static final UniqueKey<TagRecord> CONSTRAINT_1BF = Internal.createUniqueKey(Tag.TAG,
+			DSL.name("CONSTRAINT_1BF"), new TableField[] { Tag.TAG.NAME }, true);
 
-    // -------------------------------------------------------------------------
-    // FOREIGN KEY definitions
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// FOREIGN KEY definitions
+	// -------------------------------------------------------------------------
 
-    public static final ForeignKey<ArticleRecord, AppUserRecord> FK_ARTICLE_USER = Internal.createForeignKey(Article.ARTICLE, DSL.name("fk_article_user"), new TableField[] { Article.ARTICLE.USER_ID }, Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final ForeignKey<ArticleFavoriteRecord, ArticleRecord> FK_ARTICLE_FAVORITE_ARTICLE = Internal.createForeignKey(ArticleFavorite.ARTICLE_FAVORITE, DSL.name("fk_article_favorite_article"), new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.ARTICLE_ID }, Keys.CONSTRAINT_D, new TableField[] { Article.ARTICLE.ID }, true);
-    public static final ForeignKey<ArticleFavoriteRecord, AppUserRecord> FK_ARTICLE_FAVORITE_USER = Internal.createForeignKey(ArticleFavorite.ARTICLE_FAVORITE, DSL.name("fk_article_favorite_user"), new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.USER_ID }, Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final ForeignKey<ArticleTagRecord, ArticleRecord> FK_ARTICLE_TAG_ARTICLE = Internal.createForeignKey(ArticleTag.ARTICLE_TAG, DSL.name("fk_article_tag_article"), new TableField[] { ArticleTag.ARTICLE_TAG.ARTICLE_ID }, Keys.CONSTRAINT_D, new TableField[] { Article.ARTICLE.ID }, true);
-    public static final ForeignKey<ArticleTagRecord, TagRecord> FK_ARTICLE_TAG_TAG = Internal.createForeignKey(ArticleTag.ARTICLE_TAG, DSL.name("fk_article_tag_tag"), new TableField[] { ArticleTag.ARTICLE_TAG.TAG_ID }, Keys.CONSTRAINT_1B, new TableField[] { Tag.TAG.ID }, true);
-    public static final ForeignKey<CommentRecord, ArticleRecord> FK_COMMENT_ARTICLE = Internal.createForeignKey(Comment.COMMENT, DSL.name("fk_comment_article"), new TableField[] { Comment.COMMENT.ARTICLE_ID }, Keys.CONSTRAINT_D, new TableField[] { Article.ARTICLE.ID }, true);
-    public static final ForeignKey<CommentRecord, AppUserRecord> FK_COMMENT_USER = Internal.createForeignKey(Comment.COMMENT, DSL.name("fk_comment_user"), new TableField[] { Comment.COMMENT.USER_ID }, Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final ForeignKey<FollowRecord, AppUserRecord> FK_FOLLOW_FOLLOW_USER = Internal.createForeignKey(Follow.FOLLOW, DSL.name("fk_follow_follow_user"), new TableField[] { Follow.FOLLOW.FOLLOW_ID }, Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
-    public static final ForeignKey<FollowRecord, AppUserRecord> FK_FOLLOW_USER = Internal.createForeignKey(Follow.FOLLOW, DSL.name("fk_follow_user"), new TableField[] { Follow.FOLLOW.USER_ID }, Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final ForeignKey<ArticleRecord, AppUserRecord> FK_ARTICLE_USER = Internal.createForeignKey(
+			Article.ARTICLE, DSL.name("fk_article_user"), new TableField[] { Article.ARTICLE.USER_ID },
+			Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final ForeignKey<ArticleFavoriteRecord, ArticleRecord> FK_ARTICLE_FAVORITE_ARTICLE = Internal
+			.createForeignKey(ArticleFavorite.ARTICLE_FAVORITE, DSL.name("fk_article_favorite_article"),
+					new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.ARTICLE_ID }, Keys.CONSTRAINT_D,
+					new TableField[] { Article.ARTICLE.ID }, true);
+	public static final ForeignKey<ArticleFavoriteRecord, AppUserRecord> FK_ARTICLE_FAVORITE_USER = Internal
+			.createForeignKey(ArticleFavorite.ARTICLE_FAVORITE, DSL.name("fk_article_favorite_user"),
+					new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.USER_ID }, Keys.CONSTRAINT_4,
+					new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final ForeignKey<ArticleTagRecord, ArticleRecord> FK_ARTICLE_TAG_ARTICLE = Internal.createForeignKey(
+			ArticleTag.ARTICLE_TAG, DSL.name("fk_article_tag_article"),
+			new TableField[] { ArticleTag.ARTICLE_TAG.ARTICLE_ID }, Keys.CONSTRAINT_D,
+			new TableField[] { Article.ARTICLE.ID }, true);
+	public static final ForeignKey<ArticleTagRecord, TagRecord> FK_ARTICLE_TAG_TAG = Internal.createForeignKey(
+			ArticleTag.ARTICLE_TAG, DSL.name("fk_article_tag_tag"), new TableField[] { ArticleTag.ARTICLE_TAG.TAG_ID },
+			Keys.CONSTRAINT_1B, new TableField[] { Tag.TAG.ID }, true);
+	public static final ForeignKey<CommentRecord, ArticleRecord> FK_COMMENT_ARTICLE = Internal.createForeignKey(
+			Comment.COMMENT, DSL.name("fk_comment_article"), new TableField[] { Comment.COMMENT.ARTICLE_ID },
+			Keys.CONSTRAINT_D, new TableField[] { Article.ARTICLE.ID }, true);
+	public static final ForeignKey<CommentRecord, AppUserRecord> FK_COMMENT_USER = Internal.createForeignKey(
+			Comment.COMMENT, DSL.name("fk_comment_user"), new TableField[] { Comment.COMMENT.USER_ID },
+			Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final ForeignKey<FollowRecord, AppUserRecord> FK_FOLLOW_FOLLOW_USER = Internal.createForeignKey(
+			Follow.FOLLOW, DSL.name("fk_follow_follow_user"), new TableField[] { Follow.FOLLOW.FOLLOW_ID },
+			Keys.CONSTRAINT_4, new TableField[] { AppUser.APP_USER.ID }, true);
+	public static final ForeignKey<FollowRecord, AppUserRecord> FK_FOLLOW_USER = Internal.createForeignKey(
+			Follow.FOLLOW, DSL.name("fk_follow_user"), new TableField[] { Follow.FOLLOW.USER_ID }, Keys.CONSTRAINT_4,
+			new TableField[] { AppUser.APP_USER.ID }, true);
 }

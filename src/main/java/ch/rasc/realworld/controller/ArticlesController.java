@@ -7,7 +7,6 @@ import static ch.rasc.realworld.db.tables.ArticleTag.ARTICLE_TAG;
 import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 import static ch.rasc.realworld.db.tables.Tag.TAG;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +45,11 @@ public class ArticlesController {
 	}
 
 	@PostMapping("/articles")
-	public ResponseEntity<?> createArticle(
-			@Valid @RequestBody NewArticleParam newArticleParam,
-			BindingResult bindingResult,
-			@AuthenticationPrincipal AuthenticatedUser user) {
+	public ResponseEntity<?> createArticle(@Valid @RequestBody NewArticleParam newArticleParam,
+			BindingResult bindingResult, @AuthenticationPrincipal AuthenticatedUser user) {
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
 		var articleRecord = this.dsl.newRecord(ARTICLE);
@@ -68,48 +64,39 @@ public class ArticlesController {
 
 		if (newArticleParam.tagList != null) {
 			for (String tag : newArticleParam.tagList) {
-				var tagRecord = this.dsl.select(TAG.ID).from(TAG).where(TAG.NAME.eq(tag))
-						.fetchOne();
+				var tagRecord = this.dsl.select(TAG.ID).from(TAG).where(TAG.NAME.eq(tag)).fetchOne();
 				if (tagRecord == null) {
 					var newTagRecord = this.dsl.newRecord(TAG);
 					newTagRecord.setName(tag);
 					newTagRecord.store();
-					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID,
-							ARTICLE_TAG.TAG_ID)
-							.values(articleRecord.getId(), newTagRecord.getId())
-							.execute();
-				}
-				else {
-					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID,
-							ARTICLE_TAG.TAG_ID)
-							.values(articleRecord.getId(), tagRecord.get(TAG.ID))
-							.execute();
+					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
+							.values(articleRecord.getId(), newTagRecord.getId()).execute();
+				} else {
+					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
+							.values(articleRecord.getId(), tagRecord.get(TAG.ID)).execute();
 				}
 			}
 		}
 
-		return ResponseEntity.ok(Map.of("article",
-				Util.getArticle(this.dsl, articleRecord.getId(), user.getId())));
+		return ResponseEntity.ok(Map.of("article", Util.getArticle(this.dsl, articleRecord.getId(), user.getId())));
 	}
 
 	@GetMapping(path = "/articles/feed")
-	public ResponseEntity<ArticleDataList> getFeed(
-			@RequestParam(value = "offset", defaultValue = "0") int offset,
+	public ResponseEntity<ArticleDataList> getFeed(@RequestParam(value = "offset", defaultValue = "0") int offset,
 			@RequestParam(value = "limit", defaultValue = "20") int limit,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW)
-				.where(FOLLOW.USER_ID.eq(user.getId())).fetch();
+		var followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW).where(FOLLOW.USER_ID.eq(user.getId()))
+				.fetch();
 		if (followUserIds.isEmpty()) {
 			return ResponseEntity.ok(new ArticleDataList(List.of(), 0));
 		}
 
-		var articlesRecords = this.dsl.selectFrom(ARTICLE)
-				.where(ARTICLE.USER_ID.in(followUserIds)).offset(offset).limit(limit)
-				.fetch();
+		var articlesRecords = this.dsl.selectFrom(ARTICLE).where(ARTICLE.USER_ID.in(followUserIds)).offset(offset)
+				.limit(limit).fetch();
 
-		int articlesCount = this.dsl.selectCount().from(ARTICLE)
-				.where(ARTICLE.USER_ID.in(followUserIds)).fetchOne(0, int.class);
+		int articlesCount = this.dsl.selectCount().from(ARTICLE).where(ARTICLE.USER_ID.in(followUserIds)).fetchOne(0,
+				int.class);
 
 		List<Article> articles = new ArrayList<>();
 		for (var articleRecord : articlesRecords) {
@@ -120,8 +107,7 @@ public class ArticlesController {
 	}
 
 	@GetMapping("/articles")
-	public ResponseEntity<ArticleDataList> getArticles(
-			@RequestParam(value = "offset", defaultValue = "0") int offset,
+	public ResponseEntity<ArticleDataList> getArticles(@RequestParam(value = "offset", defaultValue = "0") int offset,
 			@RequestParam(value = "limit", defaultValue = "20") int limit,
 			@RequestParam(value = "tag", required = false) String tag,
 			@RequestParam(value = "favorited", required = false) String favoritedBy,
@@ -132,28 +118,23 @@ public class ArticlesController {
 		var articlesCountQuery = this.dsl.selectCount().from(ARTICLE);
 
 		if (StringUtils.hasText(tag)) {
-			articlesQuery.innerJoin(ARTICLE_TAG).on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID))
-					.innerJoin(TAG).onKey().where(TAG.NAME.eq(tag));
-			articlesCountQuery.innerJoin(ARTICLE_TAG)
-					.on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(TAG).onKey()
+			articlesQuery.innerJoin(ARTICLE_TAG).on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(TAG).onKey()
+					.where(TAG.NAME.eq(tag));
+			articlesCountQuery.innerJoin(ARTICLE_TAG).on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(TAG).onKey()
 					.where(TAG.NAME.eq(tag));
 		}
 
 		if (StringUtils.hasText(favoritedBy)) {
-			articlesQuery.innerJoin(ARTICLE_FAVORITE)
-					.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(APP_USER)
-					.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
-					.where(APP_USER.USERNAME.eq(favoritedBy));
-			articlesCountQuery.innerJoin(ARTICLE_FAVORITE)
-					.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(APP_USER)
-					.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
+			articlesQuery.innerJoin(ARTICLE_FAVORITE).on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(APP_USER)
+					.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID)).where(APP_USER.USERNAME.eq(favoritedBy));
+			articlesCountQuery.innerJoin(ARTICLE_FAVORITE).on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
+					.innerJoin(APP_USER).on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
 					.where(APP_USER.USERNAME.eq(favoritedBy));
 		}
 
 		if (StringUtils.hasText(author)) {
 			articlesQuery.innerJoin(APP_USER).onKey().where(APP_USER.USERNAME.eq(author));
-			articlesCountQuery.innerJoin(APP_USER).onKey()
-					.where(APP_USER.USERNAME.eq(author));
+			articlesCountQuery.innerJoin(APP_USER).onKey().where(APP_USER.USERNAME.eq(author));
 		}
 
 		var articlesRecords = articlesQuery.offset(offset).limit(limit).fetch();
@@ -165,15 +146,11 @@ public class ArticlesController {
 
 		List<Article> articles = new ArrayList<>();
 		for (var articleRecord : articlesRecords) {
-			ArticleRecord record = new ArticleRecord(articleRecord.get(ARTICLE.ID),
-					articleRecord.get(ARTICLE.USER_ID), articleRecord.get(ARTICLE.SLUG),
-					articleRecord.get(ARTICLE.TITLE),
-					articleRecord.get(ARTICLE.DESCRIPTION),
-					articleRecord.get(ARTICLE.BODY),
-					articleRecord.get(ARTICLE.CREATED_AT),
-					articleRecord.get(ARTICLE.UPDATED_AT));
-			articles.add(
-					Util.getArticle(this.dsl, record, user != null ? user.getId() : -1));
+			ArticleRecord record = new ArticleRecord(articleRecord.get(ARTICLE.ID), articleRecord.get(ARTICLE.USER_ID),
+					articleRecord.get(ARTICLE.SLUG), articleRecord.get(ARTICLE.TITLE),
+					articleRecord.get(ARTICLE.DESCRIPTION), articleRecord.get(ARTICLE.BODY),
+					articleRecord.get(ARTICLE.CREATED_AT), articleRecord.get(ARTICLE.UPDATED_AT));
+			articles.add(Util.getArticle(this.dsl, record, user != null ? user.getId() : -1));
 		}
 		return ResponseEntity.ok(new ArticleDataList(articles, articlesCount));
 	}
