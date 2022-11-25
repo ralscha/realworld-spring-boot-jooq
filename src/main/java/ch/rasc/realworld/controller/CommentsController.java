@@ -5,7 +5,7 @@ import static ch.rasc.realworld.db.tables.Article.ARTICLE;
 import static ch.rasc.realworld.db.tables.Comment.COMMENT;
 import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,8 +61,8 @@ public class CommentsController {
 		var newComment = this.dsl.newRecord(COMMENT);
 		newComment.setArticleId(record.get(ARTICLE.ID));
 		newComment.setBody(newCommentParam.body);
-		newComment.setCreatedAt(LocalDateTime.now());
-		newComment.setUpdatedAt(LocalDateTime.now());
+		newComment.setCreatedAt(OffsetDateTime.now());
+		newComment.setUpdatedAt(OffsetDateTime.now());
 		newComment.setUserId(user.getId());
 		newComment.store();
 

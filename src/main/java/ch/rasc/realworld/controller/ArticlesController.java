@@ -8,6 +8,7 @@ import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 import static ch.rasc.realworld.db.tables.Tag.TAG;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,8 @@ public class ArticlesController {
 		articleRecord.setTitle(newArticleParam.title);
 		articleRecord.setDescription(newArticleParam.description);
 		articleRecord.setBody(newArticleParam.body);
-		articleRecord.setCreatedAt(LocalDateTime.now());
-		articleRecord.setUpdatedAt(LocalDateTime.now());
+		articleRecord.setCreatedAt(OffsetDateTime.now());
+		articleRecord.setUpdatedAt(OffsetDateTime.now());
 		articleRecord.setSlug(Util.toSlug(newArticleParam.title));
 		articleRecord.setUserId(user.getId());
 		articleRecord.store();

@@ -39,8 +39,9 @@
 			<artifactId>flyway-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -113,6 +114,10 @@
 												<property>
 													<key>scripts</key>
 													<value>src/main/resources/db/migration/*</value>
+												</property>
+												<property>
+													<key>defaultNameCase</key>
+													<value>lower</value>
 												</property>
 											</properties>
 										</database>
