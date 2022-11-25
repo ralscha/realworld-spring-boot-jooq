@@ -8,6 +8,7 @@ import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,9 +65,17 @@ public class CurrentUserController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		this.dsl.update(APP_USER).set(APP_USER.EMAIL, updateUserParam.email)
-				.set(APP_USER.USERNAME, updateUserParam.username).set(APP_USER.BIO, updateUserParam.bio)
-				.set(APP_USER.IMAGE, updateUserParam.image).where(APP_USER.ID.eq(currentUser.getId())).execute();
+		var updater = this.dsl.update(APP_USER);
+
+		if (StringUtils.hasText(updateUserParam.email)) {
+			updater.set(APP_USER.EMAIL, updateUserParam.email);
+		}
+
+		if (StringUtils.hasText(updateUserParam.username)) {
+			updater.set(APP_USER.USERNAME, updateUserParam.username);
+		}
+		updater.set(APP_USER.BIO, updateUserParam.bio);
+		updater.set(APP_USER.IMAGE, updateUserParam.image).where(APP_USER.ID.eq(currentUser.getId())).execute();
 
 		var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
 
