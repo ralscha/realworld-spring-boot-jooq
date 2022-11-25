@@ -256,8 +256,8 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord>
 	}
 
 	@Override
-	public CommentRecord values(Long value1, String value2, Long value3, Long value4,
-			LocalDateTime value5, LocalDateTime value6) {
+	public CommentRecord values(Long value1, String value2, Long value3, Long value4, LocalDateTime value5,
+			LocalDateTime value6) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -281,8 +281,8 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord>
 	/**
 	 * Create a detached, initialised CommentRecord
 	 */
-	public CommentRecord(Long id, String body, Long articleId, Long userId,
-			LocalDateTime createdAt, LocalDateTime updatedAt) {
+	public CommentRecord(Long id, String body, Long articleId, Long userId, LocalDateTime createdAt,
+			LocalDateTime updatedAt) {
 		super(Comment.COMMENT);
 
 		setId(id);

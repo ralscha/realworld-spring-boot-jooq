@@ -60,35 +60,31 @@ public class Comment extends TableImpl<CommentRecord> {
 	/**
 	 * The column <code>COMMENT.BODY</code>.
 	 */
-	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"),
-			SQLDataType.CLOB, this, "");
+	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"), SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>COMMENT.ARTICLE_ID</code>.
 	 */
-	public final TableField<CommentRecord, Long> ARTICLE_ID = createField(
-			DSL.name("ARTICLE_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<CommentRecord, Long> ARTICLE_ID = createField(DSL.name("ARTICLE_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.USER_ID</code>.
 	 */
-	public final TableField<CommentRecord, Long> USER_ID = createField(
-			DSL.name("USER_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<CommentRecord, Long> USER_ID = createField(DSL.name("USER_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.CREATED_AT</code>.
 	 */
-	public final TableField<CommentRecord, LocalDateTime> CREATED_AT = createField(
-			DSL.name("CREATED_AT"), SQLDataType.LOCALDATETIME(6).nullable(false), this,
-			"");
+	public final TableField<CommentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("CREATED_AT"),
+			SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.UPDATED_AT</code>.
 	 */
-	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(
-			DSL.name("UPDATED_AT"),
-			SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(
-					DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
+	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"), SQLDataType
+			.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
 			this, "");
 
 	private Comment(Name alias, Table<CommentRecord> aliased) {
@@ -151,22 +147,20 @@ public class Comment extends TableImpl<CommentRecord> {
 	 * Get the implicit join path to the <code>PUBLIC.ARTICLE</code> table.
 	 */
 	public Article article() {
-		if (this._article == null) {
-			this._article = new Article(this, Keys.CONSTRAINT_637);
-		}
+		if (_article == null)
+			_article = new Article(this, Keys.CONSTRAINT_637);
 
-		return this._article;
+		return _article;
 	}
 
 	/**
 	 * Get the implicit join path to the <code>PUBLIC.APP_USER</code> table.
 	 */
 	public AppUser appUser() {
-		if (this._appUser == null) {
-			this._appUser = new AppUser(this, Keys.CONSTRAINT_63);
-		}
+		if (_appUser == null)
+			_appUser = new AppUser(this, Keys.CONSTRAINT_63);
 
-		return this._appUser;
+		return _appUser;
 	}
 
 	@Override

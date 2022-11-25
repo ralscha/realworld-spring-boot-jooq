@@ -59,32 +59,31 @@ public class AppUser extends TableImpl<AppUserRecord> {
 	/**
 	 * The column <code>APP_USER.USERNAME</code>.
 	 */
-	public final TableField<AppUserRecord, String> USERNAME = createField(
-			DSL.name("USERNAME"), SQLDataType.VARCHAR(255), this, "");
+	public final TableField<AppUserRecord, String> USERNAME = createField(DSL.name("USERNAME"),
+			SQLDataType.VARCHAR(255), this, "");
 
 	/**
 	 * The column <code>APP_USER.PASSWORD</code>.
 	 */
-	public final TableField<AppUserRecord, String> PASSWORD = createField(
-			DSL.name("PASSWORD"), SQLDataType.VARCHAR(255), this, "");
+	public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("PASSWORD"),
+			SQLDataType.VARCHAR(255), this, "");
 
 	/**
 	 * The column <code>APP_USER.EMAIL</code>.
 	 */
-	public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("EMAIL"),
-			SQLDataType.VARCHAR(255), this, "");
+	public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARCHAR(255),
+			this, "");
 
 	/**
 	 * The column <code>APP_USER.BIO</code>.
 	 */
-	public final TableField<AppUserRecord, String> BIO = createField(DSL.name("BIO"),
-			SQLDataType.CLOB, this, "");
+	public final TableField<AppUserRecord, String> BIO = createField(DSL.name("BIO"), SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>APP_USER.IMAGE</code>.
 	 */
-	public final TableField<AppUserRecord, String> IMAGE = createField(DSL.name("IMAGE"),
-			SQLDataType.VARCHAR(511), this, "");
+	public final TableField<AppUserRecord, String> IMAGE = createField(DSL.name("IMAGE"), SQLDataType.VARCHAR(511),
+			this, "");
 
 	private AppUser(Name alias, Table<AppUserRecord> aliased) {
 		this(alias, aliased, null);

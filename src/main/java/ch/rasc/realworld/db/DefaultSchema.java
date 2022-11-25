@@ -80,8 +80,7 @@ public class DefaultSchema extends SchemaImpl {
 
 	@Override
 	public final List<Table<?>> getTables() {
-		return Arrays.asList(AppUser.APP_USER, Article.ARTICLE,
-				ArticleFavorite.ARTICLE_FAVORITE, ArticleTag.ARTICLE_TAG, Comment.COMMENT,
-				Follow.FOLLOW, Tag.TAG);
+		return Arrays.asList(AppUser.APP_USER, Article.ARTICLE, ArticleFavorite.ARTICLE_FAVORITE,
+				ArticleTag.ARTICLE_TAG, Comment.COMMENT, Follow.FOLLOW, Tag.TAG);
 	}
 }

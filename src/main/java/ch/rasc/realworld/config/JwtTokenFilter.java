@@ -31,23 +31,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-			HttpServletResponse response, FilterChain filterChain)
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
 		String jwt = resolveToken(request);
 		if (jwt != null) {
 			Long userId = this.jwtService.getSubFromToken(jwt);
 			if (userId != null) {
-				var record = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(userId))
-						.fetchOne();
+				var record = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(userId)).fetchOne();
 				if (record != null) {
 					UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 							new AuthenticatedUser(record), null, List.of());
-					authenticationToken.setDetails(
-							new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext()
-							.setAuthentication(authenticationToken);
+					authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 				}
 			}
 		}

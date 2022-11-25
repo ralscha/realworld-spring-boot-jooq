@@ -254,8 +254,8 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord>
 	}
 
 	@Override
-	public AppUserRecord values(Long value1, String value2, String value3, String value4,
-			String value5, String value6) {
+	public AppUserRecord values(Long value1, String value2, String value3, String value4, String value5,
+			String value6) {
 		value1(value1);
 		value2(value2);
 		value3(value3);
@@ -279,8 +279,7 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord>
 	/**
 	 * Create a detached, initialised AppUserRecord
 	 */
-	public AppUserRecord(Long id, String username, String password, String email,
-			String bio, String image) {
+	public AppUserRecord(Long id, String username, String password, String email, String bio, String image) {
 		super(AppUser.APP_USER);
 
 		setId(id);

@@ -57,8 +57,7 @@ public class Tag extends TableImpl<TagRecord> {
 	/**
 	 * The column <code>TAG.NAME</code>.
 	 */
-	public final TableField<TagRecord, String> NAME = createField(DSL.name("NAME"),
-			SQLDataType.VARCHAR(255), this, "");
+	public final TableField<TagRecord, String> NAME = createField(DSL.name("NAME"), SQLDataType.VARCHAR(255), this, "");
 
 	private Tag(Name alias, Table<TagRecord> aliased) {
 		this(alias, aliased, null);
@@ -159,16 +158,14 @@ public class Tag extends TableImpl<TagRecord> {
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
 	 */
-	public <U> SelectField<U> mapping(
-			Function2<? super Long, ? super String, ? extends U> from) {
+	public <U> SelectField<U> mapping(Function2<? super Long, ? super String, ? extends U> from) {
 		return convertFrom(Records.mapping(from));
 	}
 
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Class, Function)}.
 	 */
-	public <U> SelectField<U> mapping(Class<U> toType,
-			Function2<? super Long, ? super String, ? extends U> from) {
+	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super String, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
 }

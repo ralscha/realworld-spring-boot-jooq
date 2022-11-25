@@ -47,17 +47,14 @@ public class CommentsController {
 
 	@PostMapping("/articles/{slug}/comments")
 	public ResponseEntity<?> createComment(@PathVariable("slug") String slug,
-			@AuthenticationPrincipal AuthenticatedUser user,
-			@Valid @RequestBody NewCommentParam newCommentParam,
+			@AuthenticationPrincipal AuthenticatedUser user, @Valid @RequestBody NewCommentParam newCommentParam,
 			BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE)
-				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 		var newComment = this.dsl.newRecord(COMMENT);
 		newComment.setArticleId(record.get(ARTICLE.ID));
 		newComment.setBody(newCommentParam.body);
@@ -66,69 +63,59 @@ public class CommentsController {
 		newComment.setUserId(user.getId());
 		newComment.store();
 
-		Profile author = new Profile(user.getUsername(), user.getBio(), user.getImage(),
-				false);
-		return ResponseEntity.status(201)
-				.body(Map.of("comment",
-						new Comment(newComment.getId(), newComment.getCreatedAt(),
-								newComment.getUpdatedAt(), newComment.getBody(),
-								author)));
+		Profile author = new Profile(user.getUsername(), user.getBio(), user.getImage(), false);
+		return ResponseEntity.status(201).body(Map.of("comment", new Comment(newComment.getId(),
+				newComment.getCreatedAt(), newComment.getUpdatedAt(), newComment.getBody(), author)));
 	}
 
 	@GetMapping("/articles/{slug}/comments")
 	public ResponseEntity<?> getComments(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE)
-				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 
 		List<Comment> comments = new ArrayList<>();
-		var commentRecords = this.dsl.selectFrom(COMMENT)
-				.where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID))).fetch();
+		var commentRecords = this.dsl.selectFrom(COMMENT).where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID))).fetch();
 
 		Set<Long> followUserIds = new HashSet<>();
 		if (user != null) {
-			followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW)
-					.where(FOLLOW.USER_ID.eq(user.getId())).fetchSet(FOLLOW.FOLLOW_ID);
+			followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW).where(FOLLOW.USER_ID.eq(user.getId()))
+					.fetchSet(FOLLOW.FOLLOW_ID);
 		}
 		for (CommentRecord commentRecord : commentRecords) {
-			var userRecord = this.dsl.selectFrom(APP_USER)
-					.where(APP_USER.ID.eq(commentRecord.getUserId())).fetchOne();
-			Profile author = new Profile(userRecord.getUsername(), userRecord.getBio(),
-					userRecord.getImage(), followUserIds.contains(userRecord.getId()));
-			comments.add(new Comment(commentRecord.getId(), commentRecord.getCreatedAt(),
-					commentRecord.getUpdatedAt(), commentRecord.getBody(), author));
+			var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(commentRecord.getUserId())).fetchOne();
+			Profile author = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(),
+					followUserIds.contains(userRecord.getId()));
+			comments.add(new Comment(commentRecord.getId(), commentRecord.getCreatedAt(), commentRecord.getUpdatedAt(),
+					commentRecord.getBody(), author));
 		}
 		return ResponseEntity.ok(Map.of("comments", comments));
 	}
 
 	@DeleteMapping(path = "/articles/{slug}/comments/{id}")
-	public ResponseEntity<?> deleteComment(@PathVariable("slug") String slug,
-			@PathVariable("id") long commentId,
+	public ResponseEntity<?> deleteComment(@PathVariable("slug") String slug, @PathVariable("id") long commentId,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID).from(ARTICLE)
-				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug))
+				.fetchOne();
 
 		if (articleRecord == null) {
 			return ResponseEntity.notFound().build();
 		}
 
 		var commentRecord = this.dsl.select(COMMENT.ID, COMMENT.USER_ID).from(COMMENT)
-				.where(COMMENT.ID.eq(commentId)
-						.and(COMMENT.ARTICLE_ID.eq(articleRecord.get(ARTICLE.ID))))
-				.fetchOne();
+				.where(COMMENT.ID.eq(commentId).and(COMMENT.ARTICLE_ID.eq(articleRecord.get(ARTICLE.ID)))).fetchOne();
 
 		if (commentRecord == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		if (((user.getId() != articleRecord.get(ARTICLE.USER_ID)) && (user.getId() != commentRecord.get(COMMENT.USER_ID)))) {
+		if (((user.getId() != articleRecord.get(ARTICLE.USER_ID))
+				&& (user.getId() != commentRecord.get(COMMENT.USER_ID)))) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
-		this.dsl.delete(COMMENT).where(COMMENT.ID.eq(commentRecord.get(COMMENT.ID)))
-				.execute();
+		this.dsl.delete(COMMENT).where(COMMENT.ID.eq(commentRecord.get(COMMENT.ID))).execute();
 
 		return ResponseEntity.noContent().build();
 

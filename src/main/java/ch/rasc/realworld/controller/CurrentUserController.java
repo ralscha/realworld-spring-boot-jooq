@@ -33,56 +33,45 @@ public class CurrentUserController {
 	}
 
 	@GetMapping("/user")
-	public ResponseEntity<?> currentUser(
-			@AuthenticationPrincipal AuthenticatedUser currentUser) {
-		var userRecord = this.dsl.selectFrom(APP_USER)
-				.where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
-		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(),
-				userRecord.getBio(), userRecord.getImage());
+	public ResponseEntity<?> currentUser(@AuthenticationPrincipal AuthenticatedUser currentUser) {
+		var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
+		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(), userRecord.getBio(),
+				userRecord.getImage());
 		return ResponseEntity.ok().body(Map.of("user", user));
 	}
 
 	@PutMapping("/user")
-	public ResponseEntity<?> updateProfile(
-			@AuthenticationPrincipal AuthenticatedUser currentUser,
-			@Valid @RequestBody UpdateUserParam updateUserParam,
-			BindingResult bindingResult) {
+	public ResponseEntity<?> updateProfile(@AuthenticationPrincipal AuthenticatedUser currentUser,
+			@Valid @RequestBody UpdateUserParam updateUserParam, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
 		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.USERNAME.eq(updateUserParam.username)
-						.and(APP_USER.ID.ne(currentUser.getId())))
+				.where(APP_USER.USERNAME.eq(updateUserParam.username).and(APP_USER.ID.ne(currentUser.getId())))
 				.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
 		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.EMAIL.eq(updateUserParam.email)
-						.and(APP_USER.ID.ne(currentUser.getId())))
+				.where(APP_USER.EMAIL.eq(updateUserParam.email).and(APP_USER.ID.ne(currentUser.getId())))
 				.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-					.body(Util.toError(bindingResult));
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
 		this.dsl.update(APP_USER).set(APP_USER.EMAIL, updateUserParam.email)
-				.set(APP_USER.USERNAME, updateUserParam.username)
-				.set(APP_USER.BIO, updateUserParam.bio)
-				.set(APP_USER.IMAGE, updateUserParam.image)
-				.where(APP_USER.ID.eq(currentUser.getId())).execute();
+				.set(APP_USER.USERNAME, updateUserParam.username).set(APP_USER.BIO, updateUserParam.bio)
+				.set(APP_USER.IMAGE, updateUserParam.image).where(APP_USER.ID.eq(currentUser.getId())).execute();
 
-		var userRecord = this.dsl.selectFrom(APP_USER)
-				.where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
+		var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
 
-		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(),
-				userRecord.getBio(), userRecord.getImage());
+		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(), userRecord.getBio(),
+				userRecord.getImage());
 		return ResponseEntity.ok().body(Map.of("user", user));
 	}
 
