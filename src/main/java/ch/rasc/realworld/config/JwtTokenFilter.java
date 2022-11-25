@@ -5,17 +5,17 @@ import static ch.rasc.realworld.db.tables.AppUser.APP_USER;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.jooq.DSLContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
 	private final DSLContext dsl;
@@ -59,7 +59,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	private static String resolveToken(HttpServletRequest request) {
 		String token = request.getHeader(AUTHORIZATION_HEADER);
 		if (StringUtils.hasText(token) && token.startsWith(TOKEN)) {
-			return token.substring(TOKEN.length() + 1, token.length());
+			return token.substring(TOKEN.length() + 1);
 		}
 		return null;
 	}

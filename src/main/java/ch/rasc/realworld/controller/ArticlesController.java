@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
 import ch.rasc.realworld.db.tables.records.ArticleRecord;
 import ch.rasc.realworld.dto.Article;
 import ch.rasc.realworld.dto.ArticleDataList;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 public class ArticlesController {
@@ -70,7 +69,16 @@ public class ArticlesController {
 			for (String tag : newArticleParam.tagList) {
 				var tagRecord = this.dsl.select(TAG.ID).from(TAG).where(TAG.NAME.eq(tag))
 						.fetchOne();
-				if (tagRecord != null) {
+				if (tagRecord == null) {
+					var newTagRecord = this.dsl.newRecord(TAG);
+					newTagRecord.setName(tag);
+					newTagRecord.store();
+					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID,
+							ARTICLE_TAG.TAG_ID)
+							.values(articleRecord.getId(), newTagRecord.getId())
+							.execute();
+				}
+				else {
 					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID,
 							ARTICLE_TAG.TAG_ID)
 							.values(articleRecord.getId(), tagRecord.get(TAG.ID))
@@ -163,7 +171,8 @@ public class ArticlesController {
 					articleRecord.get(ARTICLE.BODY),
 					articleRecord.get(ARTICLE.CREATED_AT),
 					articleRecord.get(ARTICLE.UPDATED_AT));
-			articles.add(Util.getArticle(this.dsl, record, user != null ? user.getId() : -1));
+			articles.add(
+					Util.getArticle(this.dsl, record, user != null ? user.getId() : -1));
 		}
 		return ResponseEntity.ok(new ArticleDataList(articles, articlesCount));
 	}

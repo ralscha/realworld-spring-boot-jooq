@@ -4,9 +4,6 @@ import static ch.rasc.realworld.db.tables.AppUser.APP_USER;
 
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +12,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
 import ch.rasc.realworld.dto.User;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 
 @RestController
 public class CurrentUserController {
@@ -36,18 +34,17 @@ public class CurrentUserController {
 
 	@GetMapping("/user")
 	public ResponseEntity<?> currentUser(
-			@AuthenticationPrincipal AuthenticatedUser currentUser,
-			@RequestHeader(value = "Authorization") String token) {
+			@AuthenticationPrincipal AuthenticatedUser currentUser) {
 		var userRecord = this.dsl.selectFrom(APP_USER)
 				.where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
-		User user = new User(userRecord, token.split(" ")[1]);
+		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(),
+				userRecord.getBio(), userRecord.getImage());
 		return ResponseEntity.ok().body(Map.of("user", user));
 	}
 
 	@PutMapping("/user")
 	public ResponseEntity<?> updateProfile(
 			@AuthenticationPrincipal AuthenticatedUser currentUser,
-			@RequestHeader("Authorization") String token,
 			@Valid @RequestBody UpdateUserParam updateUserParam,
 			BindingResult bindingResult) {
 
@@ -84,7 +81,8 @@ public class CurrentUserController {
 		var userRecord = this.dsl.selectFrom(APP_USER)
 				.where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
 
-		User user = new User(userRecord, token.split(" ")[1]);
+		User user = new User(userRecord.getEmail(), "", userRecord.getUsername(),
+				userRecord.getBio(), userRecord.getImage());
 		return ResponseEntity.ok().body(Map.of("user", user));
 	}
 

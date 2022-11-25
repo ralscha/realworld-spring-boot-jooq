@@ -82,6 +82,7 @@ public class Util {
 					record.get(ARTICLE.DESCRIPTION), record.get(ARTICLE.BODY),
 					dsl.select(TAG.NAME).from(TAG).innerJoin(ARTICLE_TAG).onKey()
 							.where(ARTICLE_TAG.ARTICLE_ID.eq(articleId))
+							.orderBy(TAG.NAME)
 							.fetchSet(TAG.NAME),
 					record.get(ARTICLE.CREATED_AT), record.get(ARTICLE.UPDATED_AT),
 					favorited, favoritesCount, author);

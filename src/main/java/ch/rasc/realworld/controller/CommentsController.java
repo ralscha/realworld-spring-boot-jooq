@@ -7,12 +7,10 @@ import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
@@ -27,14 +25,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
 import ch.rasc.realworld.db.tables.records.CommentRecord;
 import ch.rasc.realworld.dto.Comment;
 import ch.rasc.realworld.dto.Profile;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 public class CommentsController {
@@ -58,18 +58,21 @@ public class CommentsController {
 
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE)
 				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
-		var newRecord = this.dsl.newRecord(COMMENT);
-		newRecord.setArticleId(record.get(ARTICLE.ID));
-		newRecord.setBody(newCommentParam.body);
-		newRecord.setCreatedAt(LocalDateTime.now());
-		newRecord.setUpdatedAt(LocalDateTime.now());
-		newRecord.setUserId(user.getId());
-		newRecord.store();
+		var newComment = this.dsl.newRecord(COMMENT);
+		newComment.setArticleId(record.get(ARTICLE.ID));
+		newComment.setBody(newCommentParam.body);
+		newComment.setCreatedAt(LocalDateTime.now());
+		newComment.setUpdatedAt(LocalDateTime.now());
+		newComment.setUserId(user.getId());
+		newComment.store();
 
 		Profile author = new Profile(user.getUsername(), user.getBio(), user.getImage(),
 				false);
 		return ResponseEntity.status(201)
-				.body(Map.of("comment", new Comment(newRecord, author)));
+				.body(Map.of("comment",
+						new Comment(newComment.getId(), newComment.getCreatedAt(),
+								newComment.getUpdatedAt(), newComment.getBody(),
+								author)));
 	}
 
 	@GetMapping("/articles/{slug}/comments")
@@ -82,14 +85,19 @@ public class CommentsController {
 		List<Comment> comments = new ArrayList<>();
 		var commentRecords = this.dsl.selectFrom(COMMENT)
 				.where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID))).fetch();
-		Set<Long> followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW)
-				.where(FOLLOW.USER_ID.eq(user.getId())).fetchSet(FOLLOW.FOLLOW_ID);
+
+		Set<Long> followUserIds = new HashSet<>();
+		if (user != null) {
+			followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW)
+					.where(FOLLOW.USER_ID.eq(user.getId())).fetchSet(FOLLOW.FOLLOW_ID);
+		}
 		for (CommentRecord commentRecord : commentRecords) {
 			var userRecord = this.dsl.selectFrom(APP_USER)
 					.where(APP_USER.ID.eq(commentRecord.getUserId())).fetchOne();
 			Profile author = new Profile(userRecord.getUsername(), userRecord.getBio(),
 					userRecord.getImage(), followUserIds.contains(userRecord.getId()));
-			comments.add(new Comment(commentRecord, author));
+			comments.add(new Comment(commentRecord.getId(), commentRecord.getCreatedAt(),
+					commentRecord.getUpdatedAt(), commentRecord.getBody(), author));
 		}
 		return ResponseEntity.ok(Map.of("comments", comments));
 	}
@@ -115,8 +123,7 @@ public class CommentsController {
 			return ResponseEntity.notFound().build();
 		}
 
-		if (!(user.getId() == articleRecord.get(ARTICLE.USER_ID)
-				|| user.getId() == commentRecord.get(COMMENT.USER_ID))) {
+		if (((user.getId() != articleRecord.get(ARTICLE.USER_ID)) && (user.getId() != commentRecord.get(COMMENT.USER_ID)))) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 

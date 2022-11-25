@@ -4,8 +4,6 @@ import static ch.rasc.realworld.db.tables.Article.ARTICLE;
 
 import java.util.Map;
 
-import javax.validation.Valid;
-
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
 import ch.rasc.realworld.dto.Article;
+import jakarta.validation.Valid;
 
 @RestController
 public class ArticleController {
