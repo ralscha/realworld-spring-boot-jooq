@@ -14,8 +14,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtService {
@@ -24,19 +22,19 @@ public class JwtService {
 
 	@Autowired
 	public JwtService() {
-		this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-		this.jwtParser = Jwts.parserBuilder().setSigningKey(this.key).build();
+		this.key = Jwts.SIG.HS512.key().build();
+		this.jwtParser = Jwts.parser().verifyWith(this.key).build();
 	}
 
 	public String toToken(long userId) {
-		return Jwts.builder().signWith(this.key).setSubject(Long.toString(userId))
-				.setExpiration(expireTimeFromNow()).compact();
+		return Jwts.builder().signWith(this.key).subject(Long.toString(userId))
+				.expiration(expireTimeFromNow()).compact();
 	}
 
 	public Long getSubFromToken(String token) {
 		try {
-			Jws<Claims> claimsJws = this.jwtParser.parseClaimsJws(token);
-			return Long.valueOf(claimsJws.getBody().getSubject());
+			Jws<Claims> claimsJws = this.jwtParser.parseSignedClaims(token);
+			return Long.valueOf(claimsJws.getPayload().getSubject());
 		}
 		catch (Exception e) {
 			return null;
