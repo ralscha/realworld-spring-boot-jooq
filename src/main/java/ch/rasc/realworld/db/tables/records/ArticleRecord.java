@@ -366,4 +366,5 @@ public class ArticleRecord extends UpdatableRecordImpl<ArticleRecord>
 		setCreatedAt(createdAt);
 		setUpdatedAt(updatedAt);
 	}
+
 }

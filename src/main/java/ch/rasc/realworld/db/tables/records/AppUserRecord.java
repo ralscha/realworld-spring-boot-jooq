@@ -289,4 +289,5 @@ public class AppUserRecord extends UpdatableRecordImpl<AppUserRecord>
 		setBio(bio);
 		setImage(image);
 	}
+
 }

@@ -292,4 +292,5 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord>
 		setCreatedAt(createdAt);
 		setUpdatedAt(updatedAt);
 	}
+
 }

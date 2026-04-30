@@ -110,6 +110,7 @@ public class ArticleFavorite extends TableImpl<ArticleFavoriteRecord> {
 	}
 
 	private transient Article _article;
+
 	private transient AppUser _appUser;
 
 	/**
@@ -193,4 +194,5 @@ public class ArticleFavorite extends TableImpl<ArticleFavoriteRecord> {
 	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

@@ -49,13 +49,17 @@ public class ArticleController {
 	public ResponseEntity<?> updateArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user,
 			@Valid @RequestBody UpdateArticleParam updateArticleParam) {
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug))
-				.fetchOne();
+		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID)
+			.from(ARTICLE)
+			.where(ARTICLE.SLUG.eq(slug))
+			.fetchOne();
 		if (articleRecord != null) {
 			if (articleRecord.get(ARTICLE.USER_ID) == user.getId()) {
-				this.dsl.update(ARTICLE).set(ARTICLE.TITLE, updateArticleParam.title)
-						.set(ARTICLE.BODY, updateArticleParam.body)
-						.set(ARTICLE.DESCRIPTION, updateArticleParam.description).execute();
+				this.dsl.update(ARTICLE)
+					.set(ARTICLE.TITLE, updateArticleParam.title)
+					.set(ARTICLE.BODY, updateArticleParam.body)
+					.set(ARTICLE.DESCRIPTION, updateArticleParam.description)
+					.execute();
 				Article article = Util.getArticle(this.dsl, slug, user.getId());
 				if (article != null) {
 					return ResponseEntity.ok().body(Map.of("article", article));
@@ -70,8 +74,10 @@ public class ArticleController {
 	public ResponseEntity<?> deleteArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug))
-				.fetchOne();
+		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID)
+			.from(ARTICLE)
+			.where(ARTICLE.SLUG.eq(slug))
+			.fetchOne();
 		if (articleRecord != null) {
 			if (articleRecord.get(ARTICLE.USER_ID) == user.getId()) {
 				this.dsl.delete(ARTICLE).where(ARTICLE.ID.eq(articleRecord.get(ARTICLE.ID))).execute();
@@ -87,7 +93,11 @@ public class ArticleController {
 @JsonRootName("article")
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 class UpdateArticleParam {
+
 	String title = "";
+
 	String body = "";
+
 	String description = "";
+
 }

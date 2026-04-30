@@ -138,4 +138,5 @@ public class FollowRecord extends UpdatableRecordImpl<FollowRecord> implements R
 		setUserId(userId);
 		setFollowId(followId);
 	}
+
 }

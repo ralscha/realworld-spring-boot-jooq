@@ -46,13 +46,17 @@ public class UsersController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		if (this.dsl.selectCount().from(APP_USER).where(APP_USER.USERNAME.eq(registerParam.username())).fetchOne(0,
-				int.class) == 1) {
+		if (this.dsl.selectCount()
+			.from(APP_USER)
+			.where(APP_USER.USERNAME.eq(registerParam.username()))
+			.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
-		if (this.dsl.selectCount().from(APP_USER).where(APP_USER.EMAIL.eq(registerParam.email())).fetchOne(0,
-				int.class) == 1) {
+		if (this.dsl.selectCount()
+			.from(APP_USER)
+			.where(APP_USER.EMAIL.eq(registerParam.email()))
+			.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 

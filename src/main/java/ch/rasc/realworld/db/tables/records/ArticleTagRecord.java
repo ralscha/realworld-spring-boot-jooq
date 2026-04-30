@@ -138,4 +138,5 @@ public class ArticleTagRecord extends UpdatableRecordImpl<ArticleTagRecord> impl
 		setArticleId(articleId);
 		setTagId(tagId);
 	}
+
 }

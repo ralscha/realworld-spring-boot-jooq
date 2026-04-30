@@ -110,6 +110,7 @@ public class Follow extends TableImpl<FollowRecord> {
 	}
 
 	private transient AppUser _constraint_7bf;
+
 	private transient AppUser _constraint_7bf0;
 
 	/**
@@ -195,4 +196,5 @@ public class Follow extends TableImpl<FollowRecord> {
 	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

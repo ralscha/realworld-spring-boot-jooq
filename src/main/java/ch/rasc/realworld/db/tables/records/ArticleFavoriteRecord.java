@@ -138,4 +138,5 @@ public class ArticleFavoriteRecord extends UpdatableRecordImpl<ArticleFavoriteRe
 		setArticleId(articleId);
 		setUserId(userId);
 	}
+
 }

@@ -5,10 +5,15 @@ import ch.rasc.realworld.db.tables.records.AppUserRecord;
 public class AuthenticatedUser {
 
 	private final long id;
+
 	private final String email;
+
 	private final String username;
+
 	private final String password;
+
 	private final String bio;
+
 	private final String image;
 
 	public AuthenticatedUser(AppUserRecord record) {

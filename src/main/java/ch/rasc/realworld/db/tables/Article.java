@@ -95,8 +95,10 @@ public class Article extends TableImpl<ArticleRecord> {
 	/**
 	 * The column <code>ARTICLE.UPDATED_AT</code>.
 	 */
-	public final TableField<ArticleRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"), SQLDataType
-			.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
+	public final TableField<ArticleRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"),
+			SQLDataType.LOCALDATETIME(6)
+				.nullable(false)
+				.defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
 			this, "");
 
 	private Article(Name alias, Table<ArticleRecord> aliased) {
@@ -163,10 +165,11 @@ public class Article extends TableImpl<ArticleRecord> {
 	 * Get the implicit join path to the <code>PUBLIC.APP_USER</code> table.
 	 */
 	public AppUser appUser() {
-		if (_appUser == null)
-			_appUser = new AppUser(this, Keys.CONSTRAINT_FF2);
+		if (this._appUser == null) {
+			this._appUser = new AppUser(this, Keys.CONSTRAINT_FF2);
+		}
 
-		return _appUser;
+		return this._appUser;
 	}
 
 	@Override
@@ -232,4 +235,5 @@ public class Article extends TableImpl<ArticleRecord> {
 			Function8<? super Long, ? super Long, ? super String, ? super String, ? super String, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

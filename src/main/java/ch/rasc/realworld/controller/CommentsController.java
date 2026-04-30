@@ -1,10 +1,5 @@
 package ch.rasc.realworld.controller;
 
-import static ch.rasc.realworld.db.tables.AppUser.APP_USER;
-import static ch.rasc.realworld.db.tables.Article.ARTICLE;
-import static ch.rasc.realworld.db.tables.Comment.COMMENT;
-import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +25,10 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
+import static ch.rasc.realworld.db.tables.AppUser.APP_USER;
+import static ch.rasc.realworld.db.tables.Article.ARTICLE;
+import static ch.rasc.realworld.db.tables.Comment.COMMENT;
+import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 import ch.rasc.realworld.db.tables.records.CommentRecord;
 import ch.rasc.realworld.dto.Comment;
 import ch.rasc.realworld.dto.Profile;
@@ -64,8 +63,9 @@ public class CommentsController {
 		newComment.store();
 
 		Profile author = new Profile(user.getUsername(), user.getBio(), user.getImage(), false);
-		return ResponseEntity.status(201).body(Map.of("comment", new Comment(newComment.getId(),
-				newComment.getCreatedAt(), newComment.getUpdatedAt(), newComment.getBody(), author)));
+		return ResponseEntity.status(201)
+			.body(Map.of("comment", new Comment(newComment.getId(), newComment.getCreatedAt(),
+					newComment.getUpdatedAt(), newComment.getBody(), author)));
 	}
 
 	@GetMapping("/articles/{slug}/comments")
@@ -79,8 +79,10 @@ public class CommentsController {
 
 		Set<Long> followUserIds = new HashSet<>();
 		if (user != null) {
-			followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW).where(FOLLOW.USER_ID.eq(user.getId()))
-					.fetchSet(FOLLOW.FOLLOW_ID);
+			followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID)
+				.from(FOLLOW)
+				.where(FOLLOW.USER_ID.eq(user.getId()))
+				.fetchSet(FOLLOW.FOLLOW_ID);
 		}
 		for (CommentRecord commentRecord : commentRecords) {
 			var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(commentRecord.getUserId())).fetchOne();
@@ -96,22 +98,25 @@ public class CommentsController {
 	public ResponseEntity<?> deleteComment(@PathVariable("slug") String slug, @PathVariable("id") long commentId,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug))
-				.fetchOne();
+		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID)
+			.from(ARTICLE)
+			.where(ARTICLE.SLUG.eq(slug))
+			.fetchOne();
 
 		if (articleRecord == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		var commentRecord = this.dsl.select(COMMENT.ID, COMMENT.USER_ID).from(COMMENT)
-				.where(COMMENT.ID.eq(commentId).and(COMMENT.ARTICLE_ID.eq(articleRecord.get(ARTICLE.ID)))).fetchOne();
+		var commentRecord = this.dsl.select(COMMENT.ID, COMMENT.USER_ID)
+			.from(COMMENT)
+			.where(COMMENT.ID.eq(commentId).and(COMMENT.ARTICLE_ID.eq(articleRecord.get(ARTICLE.ID))))
+			.fetchOne();
 
 		if (commentRecord == null) {
 			return ResponseEntity.notFound().build();
 		}
 
-		if (((user.getId() != articleRecord.get(ARTICLE.USER_ID))
-				&& (user.getId() != commentRecord.get(COMMENT.USER_ID)))) {
+		if (user.getId() != articleRecord.get(ARTICLE.USER_ID) && user.getId() != commentRecord.get(COMMENT.USER_ID)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
@@ -126,6 +131,8 @@ public class CommentsController {
 @JsonRootName("comment")
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 class NewCommentParam {
+
 	@NotBlank(message = "can't be empty")
 	String body;
+
 }

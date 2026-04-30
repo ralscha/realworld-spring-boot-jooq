@@ -18,11 +18,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
+
 	private final DSLContext dsl;
 
 	private final JwtService jwtService;
 
 	private final static String AUTHORIZATION_HEADER = "Authorization";
+
 	private final static String TOKEN = "Token";
 
 	public JwtTokenFilter(DSLContext dsl, JwtService jwtService) {

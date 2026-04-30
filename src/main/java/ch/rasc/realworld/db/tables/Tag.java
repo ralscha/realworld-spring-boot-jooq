@@ -168,4 +168,5 @@ public class Tag extends TableImpl<TagRecord> {
 	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super String, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

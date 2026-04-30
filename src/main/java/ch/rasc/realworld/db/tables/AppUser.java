@@ -201,4 +201,5 @@ public class AppUser extends TableImpl<AppUserRecord> {
 			Function6<? super Long, ? super String, ? super String, ? super String, ? super String, ? super String, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

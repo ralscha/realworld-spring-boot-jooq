@@ -110,6 +110,7 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 	}
 
 	private transient Article _article;
+
 	private transient Tag _tag;
 
 	/**
@@ -193,4 +194,5 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

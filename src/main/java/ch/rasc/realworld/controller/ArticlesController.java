@@ -38,6 +38,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @RestController
 public class ArticlesController {
+
 	private final DSLContext dsl;
 
 	public ArticlesController(DSLContext dsl) {
@@ -70,10 +71,13 @@ public class ArticlesController {
 					newTagRecord.setName(tag);
 					newTagRecord.store();
 					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
-							.values(articleRecord.getId(), newTagRecord.getId()).execute();
-				} else {
+						.values(articleRecord.getId(), newTagRecord.getId())
+						.execute();
+				}
+				else {
 					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
-							.values(articleRecord.getId(), tagRecord.get(TAG.ID)).execute();
+						.values(articleRecord.getId(), tagRecord.get(TAG.ID))
+						.execute();
 				}
 			}
 		}
@@ -86,17 +90,24 @@ public class ArticlesController {
 			@RequestParam(value = "limit", defaultValue = "20") int limit,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID).from(FOLLOW).where(FOLLOW.USER_ID.eq(user.getId()))
-				.fetch();
+		var followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID)
+			.from(FOLLOW)
+			.where(FOLLOW.USER_ID.eq(user.getId()))
+			.fetch();
 		if (followUserIds.isEmpty()) {
 			return ResponseEntity.ok(new ArticleDataList(List.of(), 0));
 		}
 
-		var articlesRecords = this.dsl.selectFrom(ARTICLE).where(ARTICLE.USER_ID.in(followUserIds)).offset(offset)
-				.limit(limit).fetch();
+		var articlesRecords = this.dsl.selectFrom(ARTICLE)
+			.where(ARTICLE.USER_ID.in(followUserIds))
+			.offset(offset)
+			.limit(limit)
+			.fetch();
 
-		int articlesCount = this.dsl.selectCount().from(ARTICLE).where(ARTICLE.USER_ID.in(followUserIds)).fetchOne(0,
-				int.class);
+		int articlesCount = this.dsl.selectCount()
+			.from(ARTICLE)
+			.where(ARTICLE.USER_ID.in(followUserIds))
+			.fetchOne(0, int.class);
 
 		List<Article> articles = new ArrayList<>();
 		for (var articleRecord : articlesRecords) {
@@ -118,18 +129,29 @@ public class ArticlesController {
 		var articlesCountQuery = this.dsl.selectCount().from(ARTICLE);
 
 		if (StringUtils.hasText(tag)) {
-			articlesQuery.innerJoin(ARTICLE_TAG).on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(TAG).onKey()
-					.where(TAG.NAME.eq(tag));
-			articlesCountQuery.innerJoin(ARTICLE_TAG).on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(TAG).onKey()
-					.where(TAG.NAME.eq(tag));
+			articlesQuery.innerJoin(ARTICLE_TAG)
+				.on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID))
+				.innerJoin(TAG)
+				.onKey()
+				.where(TAG.NAME.eq(tag));
+			articlesCountQuery.innerJoin(ARTICLE_TAG)
+				.on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID))
+				.innerJoin(TAG)
+				.onKey()
+				.where(TAG.NAME.eq(tag));
 		}
 
 		if (StringUtils.hasText(favoritedBy)) {
-			articlesQuery.innerJoin(ARTICLE_FAVORITE).on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)).innerJoin(APP_USER)
-					.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID)).where(APP_USER.USERNAME.eq(favoritedBy));
-			articlesCountQuery.innerJoin(ARTICLE_FAVORITE).on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
-					.innerJoin(APP_USER).on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
-					.where(APP_USER.USERNAME.eq(favoritedBy));
+			articlesQuery.innerJoin(ARTICLE_FAVORITE)
+				.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
+				.innerJoin(APP_USER)
+				.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
+				.where(APP_USER.USERNAME.eq(favoritedBy));
+			articlesCountQuery.innerJoin(ARTICLE_FAVORITE)
+				.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
+				.innerJoin(APP_USER)
+				.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
+				.where(APP_USER.USERNAME.eq(favoritedBy));
 		}
 
 		if (StringUtils.hasText(author)) {
@@ -154,17 +176,22 @@ public class ArticlesController {
 		}
 		return ResponseEntity.ok(new ArticleDataList(articles, articlesCount));
 	}
+
 }
 
 @JsonRootName("article")
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 class NewArticleParam {
+
 	@NotBlank(message = "can't be empty")
 	String title;
+
 	@NotBlank(message = "can't be empty")
 	String description;
+
 	@NotBlank(message = "can't be empty")
 	String body;
+
 	String[] tagList;
 
 }

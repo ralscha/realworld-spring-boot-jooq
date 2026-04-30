@@ -18,6 +18,7 @@ import ch.rasc.realworld.config.AuthenticatedUser;
 
 @RestController
 public class ArticleFavoriteController {
+
 	private final DSLContext dsl;
 
 	public ArticleFavoriteController(DSLContext dsl) {
@@ -44,8 +45,10 @@ public class ArticleFavoriteController {
 
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 		if (record != null) {
-			this.dsl.delete(ARTICLE_FAVORITE).where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
-					.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID)))).execute();
+			this.dsl.delete(ARTICLE_FAVORITE)
+				.where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
+					.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID))))
+				.execute();
 		}
 
 		return ResponseEntity.ok().body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));

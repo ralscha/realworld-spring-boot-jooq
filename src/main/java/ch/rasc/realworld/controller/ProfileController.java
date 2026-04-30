@@ -35,9 +35,10 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		boolean following = this.dsl.selectCount().from(FOLLOW)
-				.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-				.fetchOne(0, int.class) == 1;
+		boolean following = this.dsl.selectCount()
+			.from(FOLLOW)
+			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
+			.fetchOne(0, int.class) == 1;
 
 		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
 
@@ -53,12 +54,14 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		this.dsl.insertInto(FOLLOW, FOLLOW.USER_ID, FOLLOW.FOLLOW_ID).values(user.getId(), userRecord.getId())
-				.execute();
+		this.dsl.insertInto(FOLLOW, FOLLOW.USER_ID, FOLLOW.FOLLOW_ID)
+			.values(user.getId(), userRecord.getId())
+			.execute();
 
-		boolean following = this.dsl.selectCount().from(FOLLOW)
-				.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-				.fetchOne(0, int.class) == 1;
+		boolean following = this.dsl.selectCount()
+			.from(FOLLOW)
+			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
+			.fetchOne(0, int.class) == 1;
 
 		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
 
@@ -73,12 +76,14 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		this.dsl.delete(FOLLOW).where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-				.execute();
+		this.dsl.delete(FOLLOW)
+			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
+			.execute();
 
-		boolean following = this.dsl.selectCount().from(FOLLOW)
-				.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-				.fetchOne(0, int.class) == 1;
+		boolean following = this.dsl.selectCount()
+			.from(FOLLOW)
+			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
+			.fetchOne(0, int.class) == 1;
 
 		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
 

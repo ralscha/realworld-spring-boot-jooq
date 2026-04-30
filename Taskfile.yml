@@ -1,0 +1,34 @@
+version: '3'
+
+vars:
+  MVNW: '{{if eq OS "windows"}}cmd /c mvnw.cmd{{else}}./mvnw{{end}}'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list-all
+  clean:
+    desc: Clean the project
+    cmds:
+      - '{{.MVNW}} clean'
+
+  compile:
+    desc: Compile the project without tests
+    cmds:
+      - '{{.MVNW}} -DskipTests compile'
+
+  format:
+    desc: Format Java sources
+    cmds:
+      - '{{.MVNW}} -q spring-javaformat:apply'
+
+  lint:
+    desc: Run PMD checks
+    cmds:
+      - '{{.MVNW}} -q pmd:check'
+
+  sortpom:
+    desc: Sort the root POM
+    cmds:
+      - '{{.MVNW}} -q sortpom:sort'

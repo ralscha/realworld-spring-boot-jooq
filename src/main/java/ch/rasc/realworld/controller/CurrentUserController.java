@@ -8,7 +8,6 @@ import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,6 +26,7 @@ import jakarta.validation.constraints.Email;
 
 @RestController
 public class CurrentUserController {
+
 	private final DSLContext dsl;
 
 	public CurrentUserController(DSLContext dsl) {
@@ -49,15 +49,17 @@ public class CurrentUserController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.USERNAME.eq(updateUserParam.username).and(APP_USER.ID.ne(currentUser.getId())))
-				.fetchOne(0, int.class) == 1) {
+		if (this.dsl.selectCount()
+			.from(APP_USER)
+			.where(APP_USER.USERNAME.eq(updateUserParam.username).and(APP_USER.ID.ne(currentUser.getId())))
+			.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
-		if (this.dsl.selectCount().from(APP_USER)
-				.where(APP_USER.EMAIL.eq(updateUserParam.email).and(APP_USER.ID.ne(currentUser.getId())))
-				.fetchOne(0, int.class) == 1) {
+		if (this.dsl.selectCount()
+			.from(APP_USER)
+			.where(APP_USER.EMAIL.eq(updateUserParam.email).and(APP_USER.ID.ne(currentUser.getId())))
+			.fetchOne(0, int.class) == 1) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 
@@ -65,17 +67,13 @@ public class CurrentUserController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		var updater = this.dsl.update(APP_USER);
-
-		if (StringUtils.hasText(updateUserParam.email)) {
-			updater.set(APP_USER.EMAIL, updateUserParam.email);
-		}
-
-		if (StringUtils.hasText(updateUserParam.username)) {
-			updater.set(APP_USER.USERNAME, updateUserParam.username);
-		}
-		updater.set(APP_USER.BIO, updateUserParam.bio);
-		updater.set(APP_USER.IMAGE, updateUserParam.image).where(APP_USER.ID.eq(currentUser.getId())).execute();
+		this.dsl.update(APP_USER)
+			.set(APP_USER.EMAIL, updateUserParam.email)
+			.set(APP_USER.USERNAME, updateUserParam.username)
+			.set(APP_USER.BIO, updateUserParam.bio)
+			.set(APP_USER.IMAGE, updateUserParam.image)
+			.where(APP_USER.ID.eq(currentUser.getId()))
+			.execute();
 
 		var userRecord = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(currentUser.getId())).fetchOne();
 
@@ -89,10 +87,16 @@ public class CurrentUserController {
 @JsonRootName("user")
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 class UpdateUserParam {
+
 	@Email(message = "should be an email")
 	String email = "";
+
 	String password = "";
+
 	String username = "";
+
 	String bio = "";
+
 	String image = "";
+
 }

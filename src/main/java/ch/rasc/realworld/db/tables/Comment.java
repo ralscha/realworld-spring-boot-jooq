@@ -83,8 +83,10 @@ public class Comment extends TableImpl<CommentRecord> {
 	/**
 	 * The column <code>COMMENT.UPDATED_AT</code>.
 	 */
-	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"), SQLDataType
-			.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
+	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"),
+			SQLDataType.LOCALDATETIME(6)
+				.nullable(false)
+				.defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
 			this, "");
 
 	private Comment(Name alias, Table<CommentRecord> aliased) {
@@ -141,26 +143,29 @@ public class Comment extends TableImpl<CommentRecord> {
 	}
 
 	private transient Article _article;
+
 	private transient AppUser _appUser;
 
 	/**
 	 * Get the implicit join path to the <code>PUBLIC.ARTICLE</code> table.
 	 */
 	public Article article() {
-		if (_article == null)
-			_article = new Article(this, Keys.CONSTRAINT_637);
+		if (this._article == null) {
+			this._article = new Article(this, Keys.CONSTRAINT_637);
+		}
 
-		return _article;
+		return this._article;
 	}
 
 	/**
 	 * Get the implicit join path to the <code>PUBLIC.APP_USER</code> table.
 	 */
 	public AppUser appUser() {
-		if (_appUser == null)
-			_appUser = new AppUser(this, Keys.CONSTRAINT_63);
+		if (this._appUser == null) {
+			this._appUser = new AppUser(this, Keys.CONSTRAINT_63);
+		}
 
-		return _appUser;
+		return this._appUser;
 	}
 
 	@Override
@@ -226,4 +231,5 @@ public class Comment extends TableImpl<CommentRecord> {
 			Function6<? super Long, ? super String, ? super Long, ? super Long, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

@@ -139,4 +139,5 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record2
 		setId(id);
 		setName(name);
 	}
+
 }

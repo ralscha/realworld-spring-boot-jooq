@@ -55,27 +55,37 @@ public class Util {
 
 			Profile author = null;
 			if (authorRecord != null) {
-				boolean following = dsl.selectCount().from(FOLLOW)
-						.where(FOLLOW.USER_ID.eq(userId).and(FOLLOW.FOLLOW_ID.eq(authorRecord.getId())))
-						.fetchOne(0, int.class) == 1;
+				boolean following = dsl.selectCount()
+					.from(FOLLOW)
+					.where(FOLLOW.USER_ID.eq(userId).and(FOLLOW.FOLLOW_ID.eq(authorRecord.getId())))
+					.fetchOne(0, int.class) == 1;
 
 				author = new Profile(authorRecord.get(APP_USER.USERNAME), authorRecord.get(APP_USER.BIO),
 						authorRecord.get(APP_USER.IMAGE), following);
 			}
 
-			boolean favorited = dsl.selectCount().from(ARTICLE_FAVORITE)
-					.where(ARTICLE_FAVORITE.USER_ID.eq(userId).and(ARTICLE_FAVORITE.ARTICLE_ID.eq(articleId)))
-					.fetchOne(0, int.class) == 1;
-			int favoritesCount = dsl.selectCount().from(ARTICLE_FAVORITE)
-					.where(ARTICLE_FAVORITE.ARTICLE_ID.eq(articleId)).fetchOne(0, int.class);
+			boolean favorited = dsl.selectCount()
+				.from(ARTICLE_FAVORITE)
+				.where(ARTICLE_FAVORITE.USER_ID.eq(userId).and(ARTICLE_FAVORITE.ARTICLE_ID.eq(articleId)))
+				.fetchOne(0, int.class) == 1;
+			int favoritesCount = dsl.selectCount()
+				.from(ARTICLE_FAVORITE)
+				.where(ARTICLE_FAVORITE.ARTICLE_ID.eq(articleId))
+				.fetchOne(0, int.class);
 
 			return new Article(record.get(ARTICLE.SLUG), record.get(ARTICLE.TITLE), record.get(ARTICLE.DESCRIPTION),
 					record.get(ARTICLE.BODY),
-					dsl.select(TAG.NAME).from(TAG).innerJoin(ARTICLE_TAG).onKey()
-							.where(ARTICLE_TAG.ARTICLE_ID.eq(articleId)).orderBy(TAG.NAME).fetchSet(TAG.NAME),
+					dsl.select(TAG.NAME)
+						.from(TAG)
+						.innerJoin(ARTICLE_TAG)
+						.onKey()
+						.where(ARTICLE_TAG.ARTICLE_ID.eq(articleId))
+						.orderBy(TAG.NAME)
+						.fetchSet(TAG.NAME),
 					record.get(ARTICLE.CREATED_AT), record.get(ARTICLE.UPDATED_AT), favorited, favoritesCount, author);
 
 		}
 		return null;
 	}
+
 }
