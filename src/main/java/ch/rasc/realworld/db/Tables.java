@@ -51,4 +51,5 @@ public class Tables {
 	 * The table <code>TAG</code>.
 	 */
 	public static final Tag TAG = Tag.TAG;
+
 }

@@ -58,8 +58,8 @@ public class Follow extends TableImpl<FollowRecord> {
 	/**
 	 * The column <code>FOLLOW.FOLLOW_ID</code>.
 	 */
-	public final TableField<FollowRecord, Long> FOLLOW_ID = createField(
-			DSL.name("FOLLOW_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<FollowRecord, Long> FOLLOW_ID = createField(DSL.name("FOLLOW_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	private Follow(Name alias, Table<FollowRecord> aliased) {
 		this(alias, aliased, null);
@@ -110,6 +110,7 @@ public class Follow extends TableImpl<FollowRecord> {
 	}
 
 	private transient AppUser _constraint_7bf;
+
 	private transient AppUser _constraint_7bf0;
 
 	/**
@@ -187,16 +188,15 @@ public class Follow extends TableImpl<FollowRecord> {
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
 	 */
-	public <U> SelectField<U> mapping(
-			Function2<? super Long, ? super Long, ? extends U> from) {
+	public <U> SelectField<U> mapping(Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(Records.mapping(from));
 	}
 
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Class, Function)}.
 	 */
-	public <U> SelectField<U> mapping(Class<U> toType,
-			Function2<? super Long, ? super Long, ? extends U> from) {
+	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

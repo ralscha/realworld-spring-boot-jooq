@@ -60,47 +60,45 @@ public class Article extends TableImpl<ArticleRecord> {
 	/**
 	 * The column <code>ARTICLE.USER_ID</code>.
 	 */
-	public final TableField<ArticleRecord, Long> USER_ID = createField(
-			DSL.name("USER_ID"), SQLDataType.BIGINT, this, "");
+	public final TableField<ArticleRecord, Long> USER_ID = createField(DSL.name("USER_ID"), SQLDataType.BIGINT, this,
+			"");
 
 	/**
 	 * The column <code>ARTICLE.SLUG</code>.
 	 */
-	public final TableField<ArticleRecord, String> SLUG = createField(DSL.name("SLUG"),
-			SQLDataType.VARCHAR(255), this, "");
+	public final TableField<ArticleRecord, String> SLUG = createField(DSL.name("SLUG"), SQLDataType.VARCHAR(255), this,
+			"");
 
 	/**
 	 * The column <code>ARTICLE.TITLE</code>.
 	 */
-	public final TableField<ArticleRecord, String> TITLE = createField(DSL.name("TITLE"),
-			SQLDataType.VARCHAR(255), this, "");
+	public final TableField<ArticleRecord, String> TITLE = createField(DSL.name("TITLE"), SQLDataType.VARCHAR(255),
+			this, "");
 
 	/**
 	 * The column <code>ARTICLE.DESCRIPTION</code>.
 	 */
-	public final TableField<ArticleRecord, String> DESCRIPTION = createField(
-			DSL.name("DESCRIPTION"), SQLDataType.CLOB, this, "");
+	public final TableField<ArticleRecord, String> DESCRIPTION = createField(DSL.name("DESCRIPTION"), SQLDataType.CLOB,
+			this, "");
 
 	/**
 	 * The column <code>ARTICLE.BODY</code>.
 	 */
-	public final TableField<ArticleRecord, String> BODY = createField(DSL.name("BODY"),
-			SQLDataType.CLOB, this, "");
+	public final TableField<ArticleRecord, String> BODY = createField(DSL.name("BODY"), SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>ARTICLE.CREATED_AT</code>.
 	 */
-	public final TableField<ArticleRecord, LocalDateTime> CREATED_AT = createField(
-			DSL.name("CREATED_AT"), SQLDataType.LOCALDATETIME(6).nullable(false), this,
-			"");
+	public final TableField<ArticleRecord, LocalDateTime> CREATED_AT = createField(DSL.name("CREATED_AT"),
+			SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
 	/**
 	 * The column <code>ARTICLE.UPDATED_AT</code>.
 	 */
-	public final TableField<ArticleRecord, LocalDateTime> UPDATED_AT = createField(
-			DSL.name("UPDATED_AT"),
-			SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(
-					DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
+	public final TableField<ArticleRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"),
+			SQLDataType.LOCALDATETIME(6)
+				.nullable(false)
+				.defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
 			this, "");
 
 	private Article(Name alias, Table<ArticleRecord> aliased) {
@@ -237,4 +235,5 @@ public class Article extends TableImpl<ArticleRecord> {
 			Function8<? super Long, ? super Long, ? super String, ? super String, ? super String, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

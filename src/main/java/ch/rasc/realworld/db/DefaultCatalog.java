@@ -38,4 +38,5 @@ public class DefaultCatalog extends CatalogImpl {
 	public final List<Schema> getSchemas() {
 		return Arrays.asList(DefaultSchema.DEFAULT_SCHEMA);
 	}
+
 }

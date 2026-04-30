@@ -13,7 +13,9 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 
 @Component
 public class JwtService {
+
 	private final Algorithm algorithm;
+
 	private final JWTVerifier verifier;
 
 	@Autowired
@@ -25,9 +27,10 @@ public class JwtService {
 	}
 
 	public String toToken(long userId) {
-		return JWT.create().withSubject(Long.toString(userId))
-				.withExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
-				.sign(this.algorithm);
+		return JWT.create()
+			.withSubject(Long.toString(userId))
+			.withExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+			.sign(this.algorithm);
 	}
 
 	public Long getSubFromToken(String token) {
@@ -38,4 +41,5 @@ public class JwtService {
 			return null;
 		}
 	}
+
 }

@@ -18,6 +18,7 @@ import ch.rasc.realworld.config.AuthenticatedUser;
 
 @RestController
 public class ArticleFavoriteController {
+
 	private final DSLContext dsl;
 
 	public ArticleFavoriteController(DSLContext dsl) {
@@ -25,11 +26,9 @@ public class ArticleFavoriteController {
 	}
 
 	@PostMapping("articles/{slug}/favorite")
-	public ResponseEntity<Map<String, Object>> favoriteArticle(
-			@PathVariable("slug") String slug,
+	public ResponseEntity<Map<String, Object>> favoriteArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user) {
-		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE)
-				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 		if (record != null) {
 			var newRecord = this.dsl.newRecord(ARTICLE_FAVORITE);
 			newRecord.setArticleId(record.get(ARTICLE.ID));
@@ -37,26 +36,22 @@ public class ArticleFavoriteController {
 			newRecord.store();
 		}
 
-		return ResponseEntity.ok()
-				.body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
+		return ResponseEntity.ok().body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
 	}
 
 	@DeleteMapping("articles/{slug}/favorite")
-	public ResponseEntity<Map<String, Object>> unfavoriteArticle(
-			@PathVariable("slug") String slug,
+	public ResponseEntity<Map<String, Object>> unfavoriteArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE)
-				.where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 		if (record != null) {
 			this.dsl.delete(ARTICLE_FAVORITE)
-					.where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
-							.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID))))
-					.execute();
+				.where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
+					.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID))))
+				.execute();
 		}
 
-		return ResponseEntity.ok()
-				.body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
+		return ResponseEntity.ok().body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
 	}
 
 }

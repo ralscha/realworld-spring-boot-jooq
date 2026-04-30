@@ -60,35 +60,33 @@ public class Comment extends TableImpl<CommentRecord> {
 	/**
 	 * The column <code>COMMENT.BODY</code>.
 	 */
-	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"),
-			SQLDataType.CLOB, this, "");
+	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"), SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>COMMENT.ARTICLE_ID</code>.
 	 */
-	public final TableField<CommentRecord, Long> ARTICLE_ID = createField(
-			DSL.name("ARTICLE_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<CommentRecord, Long> ARTICLE_ID = createField(DSL.name("ARTICLE_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.USER_ID</code>.
 	 */
-	public final TableField<CommentRecord, Long> USER_ID = createField(
-			DSL.name("USER_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<CommentRecord, Long> USER_ID = createField(DSL.name("USER_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.CREATED_AT</code>.
 	 */
-	public final TableField<CommentRecord, LocalDateTime> CREATED_AT = createField(
-			DSL.name("CREATED_AT"), SQLDataType.LOCALDATETIME(6).nullable(false), this,
-			"");
+	public final TableField<CommentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("CREATED_AT"),
+			SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.UPDATED_AT</code>.
 	 */
-	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(
-			DSL.name("UPDATED_AT"),
-			SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(
-					DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
+	public final TableField<CommentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("UPDATED_AT"),
+			SQLDataType.LOCALDATETIME(6)
+				.nullable(false)
+				.defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)),
 			this, "");
 
 	private Comment(Name alias, Table<CommentRecord> aliased) {
@@ -145,6 +143,7 @@ public class Comment extends TableImpl<CommentRecord> {
 	}
 
 	private transient Article _article;
+
 	private transient AppUser _appUser;
 
 	/**
@@ -232,4 +231,5 @@ public class Comment extends TableImpl<CommentRecord> {
 			Function6<? super Long, ? super String, ? super Long, ? super Long, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }

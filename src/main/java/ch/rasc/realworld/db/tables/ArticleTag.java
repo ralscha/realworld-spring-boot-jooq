@@ -52,21 +52,20 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 	/**
 	 * The column <code>ARTICLE_TAG.ARTICLE_ID</code>.
 	 */
-	public final TableField<ArticleTagRecord, Long> ARTICLE_ID = createField(
-			DSL.name("ARTICLE_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<ArticleTagRecord, Long> ARTICLE_ID = createField(DSL.name("ARTICLE_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>ARTICLE_TAG.TAG_ID</code>.
 	 */
-	public final TableField<ArticleTagRecord, Long> TAG_ID = createField(
-			DSL.name("TAG_ID"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<ArticleTagRecord, Long> TAG_ID = createField(DSL.name("TAG_ID"),
+			SQLDataType.BIGINT.nullable(false), this, "");
 
 	private ArticleTag(Name alias, Table<ArticleTagRecord> aliased) {
 		this(alias, aliased, null);
 	}
 
-	private ArticleTag(Name alias, Table<ArticleTagRecord> aliased,
-			Field<?>[] parameters) {
+	private ArticleTag(Name alias, Table<ArticleTagRecord> aliased, Field<?>[] parameters) {
 		super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
 	}
 
@@ -91,8 +90,7 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 		this(DSL.name("ARTICLE_TAG"), null);
 	}
 
-	public <O extends Record> ArticleTag(Table<O> child,
-			ForeignKey<O, ArticleTagRecord> key) {
+	public <O extends Record> ArticleTag(Table<O> child, ForeignKey<O, ArticleTagRecord> key) {
 		super(child, key, ARTICLE_TAG);
 	}
 
@@ -112,6 +110,7 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 	}
 
 	private transient Article _article;
+
 	private transient Tag _tag;
 
 	/**
@@ -187,16 +186,15 @@ public class ArticleTag extends TableImpl<ArticleTagRecord> {
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
 	 */
-	public <U> SelectField<U> mapping(
-			Function2<? super Long, ? super Long, ? extends U> from) {
+	public <U> SelectField<U> mapping(Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(Records.mapping(from));
 	}
 
 	/**
 	 * Convenience mapping calling {@link SelectField#convertFrom(Class, Function)}.
 	 */
-	public <U> SelectField<U> mapping(Class<U> toType,
-			Function2<? super Long, ? super Long, ? extends U> from) {
+	public <U> SelectField<U> mapping(Class<U> toType, Function2<? super Long, ? super Long, ? extends U> from) {
 		return convertFrom(toType, Records.mapping(from));
 	}
+
 }
