@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -127,40 +129,35 @@ public class ArticlesController {
 
 		var articlesQuery = this.dsl.select(ARTICLE.fields()).from(ARTICLE);
 		var articlesCountQuery = this.dsl.selectCount().from(ARTICLE);
+		List<Condition> filters = new ArrayList<>();
 
 		if (StringUtils.hasText(tag)) {
-			articlesQuery.innerJoin(ARTICLE_TAG)
-				.on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID))
+			filters.add(DSL.exists(this.dsl.selectOne()
+				.from(ARTICLE_TAG)
 				.innerJoin(TAG)
 				.onKey()
-				.where(TAG.NAME.eq(tag));
-			articlesCountQuery.innerJoin(ARTICLE_TAG)
-				.on(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID))
-				.innerJoin(TAG)
-				.onKey()
-				.where(TAG.NAME.eq(tag));
+				.where(ARTICLE_TAG.ARTICLE_ID.eq(ARTICLE.ID).and(TAG.NAME.eq(tag)))));
 		}
 
 		if (StringUtils.hasText(favoritedBy)) {
-			articlesQuery.innerJoin(ARTICLE_FAVORITE)
-				.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
+			filters.add(DSL.exists(this.dsl.selectOne()
+				.from(ARTICLE_FAVORITE)
 				.innerJoin(APP_USER)
 				.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
-				.where(APP_USER.USERNAME.eq(favoritedBy));
-			articlesCountQuery.innerJoin(ARTICLE_FAVORITE)
-				.on(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID))
-				.innerJoin(APP_USER)
-				.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
-				.where(APP_USER.USERNAME.eq(favoritedBy));
+				.where(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)
+					.and(APP_USER.USERNAME.eq(favoritedBy)))));
 		}
 
 		if (StringUtils.hasText(author)) {
-			articlesQuery.innerJoin(APP_USER).onKey().where(APP_USER.USERNAME.eq(author));
-			articlesCountQuery.innerJoin(APP_USER).onKey().where(APP_USER.USERNAME.eq(author));
+			filters.add(DSL.exists(this.dsl.selectOne()
+				.from(APP_USER)
+				.where(APP_USER.ID.eq(ARTICLE.USER_ID).and(APP_USER.USERNAME.eq(author)))));
 		}
 
-		var articlesRecords = articlesQuery.offset(offset).limit(limit).fetch();
-		int articlesCount = articlesCountQuery.fetchOne(0, int.class);
+		var articlesRecords = filters.isEmpty() ? articlesQuery.offset(offset).limit(limit).fetch()
+				: articlesQuery.where(filters).offset(offset).limit(limit).fetch();
+		int articlesCount = filters.isEmpty() ? articlesCountQuery.fetchOne(0, int.class)
+				: articlesCountQuery.where(filters).fetchOne(0, int.class);
 
 		if (articlesCount == 0) {
 			return ResponseEntity.ok(new ArticleDataList(List.of(), articlesCount));
