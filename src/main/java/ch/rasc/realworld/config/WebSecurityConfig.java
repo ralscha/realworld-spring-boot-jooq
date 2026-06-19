@@ -49,6 +49,10 @@ public class WebSecurityConfig {
 					.permitAll()
 					.requestMatchers(HttpMethod.GET, "/tags")
 					.permitAll()
+					.requestMatchers(HttpMethod.GET, "/actuator/health")
+					.permitAll()
+					.requestMatchers(HttpMethod.GET, "/actuator/info")
+					.permitAll()
 					.requestMatchers(HttpMethod.GET, "/profiles/*")
 					.permitAll()
 					.requestMatchers(HttpMethod.GET, "/articles")
@@ -93,7 +97,7 @@ public class WebSecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("*"));
+		configuration.setAllowedOriginPatterns(List.of("*"));
 		configuration.setAllowedMethods(asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
 		// setAllowCredentials(true) is important, otherwise:
 		// The value of the 'Access-Control-Allow-Origin' header in the response must not

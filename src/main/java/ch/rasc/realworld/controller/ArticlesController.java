@@ -7,6 +7,7 @@ import static ch.rasc.realworld.db.tables.ArticleTag.ARTICLE_TAG;
 import static ch.rasc.realworld.db.tables.Follow.FOLLOW;
 import static ch.rasc.realworld.db.tables.Tag.TAG;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +60,9 @@ public class ArticlesController {
 		articleRecord.setTitle(newArticleParam.title);
 		articleRecord.setDescription(newArticleParam.description);
 		articleRecord.setBody(newArticleParam.body);
-		articleRecord.setCreatedAt(LocalDateTime.now());
-		articleRecord.setUpdatedAt(LocalDateTime.now());
+		LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+		articleRecord.setCreatedAt(now);
+		articleRecord.setUpdatedAt(now);
 		articleRecord.setSlug(Util.toSlug(newArticleParam.title));
 		articleRecord.setUserId(user.getId());
 		articleRecord.store();
@@ -102,6 +104,7 @@ public class ArticlesController {
 
 		var articlesRecords = this.dsl.selectFrom(ARTICLE)
 			.where(ARTICLE.USER_ID.in(followUserIds))
+			.orderBy(ARTICLE.CREATED_AT.desc())
 			.offset(offset)
 			.limit(limit)
 			.fetch();
@@ -144,8 +147,7 @@ public class ArticlesController {
 				.from(ARTICLE_FAVORITE)
 				.innerJoin(APP_USER)
 				.on(ARTICLE_FAVORITE.USER_ID.eq(APP_USER.ID))
-				.where(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID)
-					.and(APP_USER.USERNAME.eq(favoritedBy)))));
+				.where(ARTICLE_FAVORITE.ARTICLE_ID.eq(ARTICLE.ID).and(APP_USER.USERNAME.eq(favoritedBy)))));
 		}
 
 		if (StringUtils.hasText(author)) {
@@ -154,8 +156,9 @@ public class ArticlesController {
 				.where(APP_USER.ID.eq(ARTICLE.USER_ID).and(APP_USER.USERNAME.eq(author)))));
 		}
 
-		var articlesRecords = filters.isEmpty() ? articlesQuery.offset(offset).limit(limit).fetch()
-				: articlesQuery.where(filters).offset(offset).limit(limit).fetch();
+		var articlesRecords = filters.isEmpty()
+				? articlesQuery.orderBy(ARTICLE.CREATED_AT.desc()).offset(offset).limit(limit).fetch()
+				: articlesQuery.where(filters).orderBy(ARTICLE.CREATED_AT.desc()).offset(offset).limit(limit).fetch();
 		int articlesCount = filters.isEmpty() ? articlesCountQuery.fetchOne(0, int.class)
 				: articlesCountQuery.where(filters).fetchOne(0, int.class);
 

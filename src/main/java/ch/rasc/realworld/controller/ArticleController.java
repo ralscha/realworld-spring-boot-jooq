@@ -2,6 +2,8 @@ package ch.rasc.realworld.controller;
 
 import static ch.rasc.realworld.db.tables.Article.ARTICLE;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.jooq.DSLContext;
@@ -49,18 +51,22 @@ public class ArticleController {
 	public ResponseEntity<?> updateArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user,
 			@Valid @RequestBody UpdateArticleParam updateArticleParam) {
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID)
-			.from(ARTICLE)
-			.where(ARTICLE.SLUG.eq(slug))
-			.fetchOne();
+		var articleRecord = this.dsl.selectFrom(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 		if (articleRecord != null) {
-			if (articleRecord.get(ARTICLE.USER_ID) == user.getId()) {
-				this.dsl.update(ARTICLE)
-					.set(ARTICLE.TITLE, updateArticleParam.title)
-					.set(ARTICLE.BODY, updateArticleParam.body)
-					.set(ARTICLE.DESCRIPTION, updateArticleParam.description)
-					.execute();
-				Article article = Util.getArticle(this.dsl, slug, user.getId());
+			if (articleRecord.getUserId() == user.getId()) {
+				if (updateArticleParam.title != null) {
+					articleRecord.setTitle(updateArticleParam.title);
+					articleRecord.setSlug(Util.toSlug(updateArticleParam.title));
+				}
+				if (updateArticleParam.body != null) {
+					articleRecord.setBody(updateArticleParam.body);
+				}
+				if (updateArticleParam.description != null) {
+					articleRecord.setDescription(updateArticleParam.description);
+				}
+				articleRecord.setUpdatedAt(LocalDateTime.now(Clock.systemUTC()));
+				articleRecord.update();
+				Article article = Util.getArticle(this.dsl, articleRecord.getSlug(), user.getId());
 				if (article != null) {
 					return ResponseEntity.ok().body(Map.of("article", article));
 				}
@@ -94,10 +100,10 @@ public class ArticleController {
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 class UpdateArticleParam {
 
-	String title = "";
+	String title;
 
-	String body = "";
+	String body;
 
-	String description = "";
+	String description;
 
 }

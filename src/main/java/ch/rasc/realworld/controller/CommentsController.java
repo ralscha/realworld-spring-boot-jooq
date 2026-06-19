@@ -1,5 +1,6 @@
 package ch.rasc.realworld.controller;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,11 +55,16 @@ public class CommentsController {
 		}
 
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		if (record == null) {
+			return ResponseEntity.notFound().build();
+		}
+
 		var newComment = this.dsl.newRecord(COMMENT);
 		newComment.setArticleId(record.get(ARTICLE.ID));
 		newComment.setBody(newCommentParam.body);
-		newComment.setCreatedAt(LocalDateTime.now());
-		newComment.setUpdatedAt(LocalDateTime.now());
+		LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+		newComment.setCreatedAt(now);
+		newComment.setUpdatedAt(now);
 		newComment.setUserId(user.getId());
 		newComment.store();
 
@@ -73,6 +79,9 @@ public class CommentsController {
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
+		if (record == null) {
+			return ResponseEntity.notFound().build();
+		}
 
 		List<Comment> comments = new ArrayList<>();
 		var commentRecords = this.dsl.selectFrom(COMMENT).where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID))).fetch();

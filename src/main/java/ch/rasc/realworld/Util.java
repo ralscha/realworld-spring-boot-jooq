@@ -9,6 +9,7 @@ import static ch.rasc.realworld.db.tables.Tag.TAG;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import ch.rasc.realworld.dto.Profile;
 public class Util {
 
 	public static String toSlug(String title) {
-		return title.toLowerCase().replaceAll("[\\&|[\\uFE30-\\uFFA0]|\\’|\\”|\\s\\?\\,\\.]+", "-");
+		return title.toLowerCase(Locale.ROOT).replaceAll("[\\&|[\\uFE30-\\uFFA0]|\\’|\\”|\\s\\?\\,\\.]+", "-");
 	}
 
 	public static Map<String, Set<String>> toError(BindingResult bindingResult) {

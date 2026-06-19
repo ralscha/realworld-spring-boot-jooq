@@ -3,12 +3,6 @@
  */
 package ch.rasc.realworld.db;
 
-import org.jooq.ForeignKey;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
 import ch.rasc.realworld.db.tables.AppUser;
 import ch.rasc.realworld.db.tables.Article;
 import ch.rasc.realworld.db.tables.ArticleFavorite;
@@ -24,11 +18,18 @@ import ch.rasc.realworld.db.tables.records.CommentRecord;
 import ch.rasc.realworld.db.tables.records.FollowRecord;
 import ch.rasc.realworld.db.tables.records.TagRecord;
 
+import org.jooq.ForeignKey;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+import org.jooq.impl.QOM.ForeignKeyRule;
+
 /**
  * A class modelling foreign key relationships and constraints of tables in the default
  * schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Keys {
 
 	// -------------------------------------------------------------------------
@@ -74,40 +75,43 @@ public class Keys {
 
 	public static final ForeignKey<ArticleRecord, AppUserRecord> CONSTRAINT_FF2 = Internal.createForeignKey(
 			Article.ARTICLE, DSL.name("CONSTRAINT_FF2"), new TableField[] { Article.ARTICLE.USER_ID },
-			Keys.CONSTRAINT_7, new TableField[] { AppUser.APP_USER.ID }, true);
+			Keys.CONSTRAINT_7, new TableField[] { AppUser.APP_USER.ID }, true, ForeignKeyRule.CASCADE,
+			ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<ArticleFavoriteRecord, ArticleRecord> CONSTRAINT_B0 = Internal.createForeignKey(
 			ArticleFavorite.ARTICLE_FAVORITE, DSL.name("CONSTRAINT_B0"),
 			new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.ARTICLE_ID }, Keys.CONSTRAINT_F,
-			new TableField[] { Article.ARTICLE.ID }, true);
+			new TableField[] { Article.ARTICLE.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<ArticleFavoriteRecord, AppUserRecord> CONSTRAINT_B05 = Internal.createForeignKey(
 			ArticleFavorite.ARTICLE_FAVORITE, DSL.name("CONSTRAINT_B05"),
 			new TableField[] { ArticleFavorite.ARTICLE_FAVORITE.USER_ID }, Keys.CONSTRAINT_7,
-			new TableField[] { AppUser.APP_USER.ID }, true);
+			new TableField[] { AppUser.APP_USER.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<ArticleTagRecord, ArticleRecord> CONSTRAINT_B12 = Internal.createForeignKey(
 			ArticleTag.ARTICLE_TAG, DSL.name("CONSTRAINT_B12"), new TableField[] { ArticleTag.ARTICLE_TAG.ARTICLE_ID },
-			Keys.CONSTRAINT_F, new TableField[] { Article.ARTICLE.ID }, true);
+			Keys.CONSTRAINT_F, new TableField[] { Article.ARTICLE.ID }, true, ForeignKeyRule.CASCADE,
+			ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<ArticleTagRecord, TagRecord> CONSTRAINT_B12C = Internal.createForeignKey(
 			ArticleTag.ARTICLE_TAG, DSL.name("CONSTRAINT_B12C"), new TableField[] { ArticleTag.ARTICLE_TAG.TAG_ID },
-			Keys.CONSTRAINT_1, new TableField[] { Tag.TAG.ID }, true);
+			Keys.CONSTRAINT_1, new TableField[] { Tag.TAG.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<CommentRecord, AppUserRecord> CONSTRAINT_63 = Internal.createForeignKey(
 			Comment.COMMENT, DSL.name("CONSTRAINT_63"), new TableField[] { Comment.COMMENT.USER_ID }, Keys.CONSTRAINT_7,
-			new TableField[] { AppUser.APP_USER.ID }, true);
+			new TableField[] { AppUser.APP_USER.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<CommentRecord, ArticleRecord> CONSTRAINT_637 = Internal.createForeignKey(
 			Comment.COMMENT, DSL.name("CONSTRAINT_637"), new TableField[] { Comment.COMMENT.ARTICLE_ID },
-			Keys.CONSTRAINT_F, new TableField[] { Article.ARTICLE.ID }, true);
+			Keys.CONSTRAINT_F, new TableField[] { Article.ARTICLE.ID }, true, ForeignKeyRule.CASCADE,
+			ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<FollowRecord, AppUserRecord> CONSTRAINT_7BF = Internal.createForeignKey(
 			Follow.FOLLOW, DSL.name("CONSTRAINT_7BF"), new TableField[] { Follow.FOLLOW.USER_ID }, Keys.CONSTRAINT_7,
-			new TableField[] { AppUser.APP_USER.ID }, true);
+			new TableField[] { AppUser.APP_USER.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 	public static final ForeignKey<FollowRecord, AppUserRecord> CONSTRAINT_7BF0 = Internal.createForeignKey(
 			Follow.FOLLOW, DSL.name("CONSTRAINT_7BF0"), new TableField[] { Follow.FOLLOW.FOLLOW_ID }, Keys.CONSTRAINT_7,
-			new TableField[] { AppUser.APP_USER.ID }, true);
+			new TableField[] { AppUser.APP_USER.ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
 
 }

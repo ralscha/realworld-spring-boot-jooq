@@ -18,6 +18,16 @@ tasks:
     cmds:
       - '{{.MVNW}} -DskipTests compile'
 
+  test:
+    desc: Run tests
+    cmds:
+      - '{{.MVNW}} test'
+
+  build:
+    desc: Build the project
+    cmds:
+      - '{{.MVNW}} package'
+
   format:
     desc: Format Java sources
     cmds:
@@ -27,6 +37,11 @@ tasks:
     desc: Run PMD checks
     cmds:
       - '{{.MVNW}} -q pmd:check'
+
+  jooq:
+    desc: Generate jOOQ sources
+    cmds:
+      - '{{.MVNW}} -Pjooq generate-sources'
 
   sortpom:
     desc: Sort the root POM

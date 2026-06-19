@@ -29,12 +29,14 @@ public class ArticleFavoriteController {
 	public ResponseEntity<Map<String, Object>> favoriteArticle(@PathVariable("slug") String slug,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
-		if (record != null) {
-			var newRecord = this.dsl.newRecord(ARTICLE_FAVORITE);
-			newRecord.setArticleId(record.get(ARTICLE.ID));
-			newRecord.setUserId(user.getId());
-			newRecord.store();
+		if (record == null) {
+			return ResponseEntity.notFound().build();
 		}
+
+		this.dsl.insertInto(ARTICLE_FAVORITE, ARTICLE_FAVORITE.ARTICLE_ID, ARTICLE_FAVORITE.USER_ID)
+			.values(record.get(ARTICLE.ID), user.getId())
+			.onDuplicateKeyIgnore()
+			.execute();
 
 		return ResponseEntity.ok().body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
 	}
@@ -44,12 +46,14 @@ public class ArticleFavoriteController {
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
 		var record = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
-		if (record != null) {
-			this.dsl.delete(ARTICLE_FAVORITE)
-				.where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
-					.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID))))
-				.execute();
+		if (record == null) {
+			return ResponseEntity.notFound().build();
 		}
+
+		this.dsl.delete(ARTICLE_FAVORITE)
+			.where(ARTICLE_FAVORITE.USER_ID.eq(user.getId())
+				.and(ARTICLE_FAVORITE.ARTICLE_ID.eq(record.get(ARTICLE.ID))))
+			.execute();
 
 		return ResponseEntity.ok().body(Map.of("article", Util.getArticle(this.dsl, slug, user.getId())));
 	}

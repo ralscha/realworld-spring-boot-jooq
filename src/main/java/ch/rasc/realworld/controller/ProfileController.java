@@ -35,7 +35,7 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		boolean following = this.dsl.selectCount()
+		boolean following = user != null && this.dsl.selectCount()
 			.from(FOLLOW)
 			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
 			.fetchOne(0, int.class) == 1;
@@ -56,6 +56,7 @@ public class ProfileController {
 
 		this.dsl.insertInto(FOLLOW, FOLLOW.USER_ID, FOLLOW.FOLLOW_ID)
 			.values(user.getId(), userRecord.getId())
+			.onDuplicateKeyIgnore()
 			.execute();
 
 		boolean following = this.dsl.selectCount()
