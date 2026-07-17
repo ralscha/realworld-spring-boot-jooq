@@ -5,7 +5,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>4.1.0</version>
-    <relativePath></relativePath>
+    <relativePath/>
   </parent>
   <groupId>ch.rasc</groupId>
   <artifactId>realworld</artifactId>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>com.auth0</groupId>
       <artifactId>java-jwt</artifactId>
-      <version>4.5.2</version>
+      <version>4.6.0</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -184,7 +184,7 @@
                     </generate>
                     <database>
                       <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
-                      <inputCatalog></inputCatalog>
+                      <inputCatalog/>
                       <inputSchema>PUBLIC</inputSchema>
                       <outputSchemaToDefault>true</outputSchemaToDefault>
                       <outputCatalogToDefault>true</outputCatalogToDefault>
