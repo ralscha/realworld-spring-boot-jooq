@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -173,6 +174,12 @@ public class Follow extends TableImpl<FollowRecord> {
 			_constraint_7bf0 = new AppUserPath(this, Keys.CONSTRAINT_7BF0, null);
 
 		return _constraint_7bf0;
+	}
+
+	@Override
+	public List<Check<FollowRecord>> getChecks() {
+		return Arrays
+			.asList(Internal.createCheck(this, DSL.name("FOLLOW_NOT_SELF"), "\"USER_ID\" <> \"FOLLOW_ID\"", true));
 	}
 
 	@Override

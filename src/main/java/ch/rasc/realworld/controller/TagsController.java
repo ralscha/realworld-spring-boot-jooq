@@ -3,7 +3,7 @@ package ch.rasc.realworld.controller;
 import static ch.rasc.realworld.db.tables.Tag.TAG;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 import org.jooq.DSLContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,8 @@ public class TagsController {
 	}
 
 	@GetMapping("/tags")
-	public Map<String, Set<String>> getTags() {
-		return Map.of("tags", this.dsl.select(TAG.NAME).from(TAG).fetchSet(TAG.NAME));
+	public Map<String, List<String>> getTags() {
+		return Map.of("tags", this.dsl.select(TAG.NAME).from(TAG).orderBy(TAG.NAME).fetch(TAG.NAME));
 	}
 
 }

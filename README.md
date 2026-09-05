@@ -51,10 +51,20 @@ Authenticated endpoints expect:
 Authorization: Token <jwt>
 ```
 
+JWTs expire after 24 hours. Set a private secret of at least 32 characters in deployed
+environments; the checked-in fallback is only for local development:
+
+```bash
+export JWT_SECRET='replace-this-with-a-long-random-secret'
+```
+
+Article list and feed responses omit article bodies, as required by the current RealWorld
+contract. Fetch an individual article to retrieve its body.
+
 ## Build And Checks
 
 ```bash
-./mvnw test
+./mvnw test # unit and HTTP integration tests
 ./mvnw -DskipTests compile
 ./mvnw -q pmd:check
 ./mvnw -q spring-javaformat:apply

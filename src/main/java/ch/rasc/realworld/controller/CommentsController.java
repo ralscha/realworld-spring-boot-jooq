@@ -84,7 +84,10 @@ public class CommentsController {
 		}
 
 		List<Comment> comments = new ArrayList<>();
-		var commentRecords = this.dsl.selectFrom(COMMENT).where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID))).fetch();
+		var commentRecords = this.dsl.selectFrom(COMMENT)
+			.where(COMMENT.ARTICLE_ID.eq(record.get(ARTICLE.ID)))
+			.orderBy(COMMENT.CREATED_AT.asc(), COMMENT.ID.asc())
+			.fetch();
 
 		Set<Long> followUserIds = new HashSet<>();
 		if (user != null) {
@@ -107,10 +110,7 @@ public class CommentsController {
 	public ResponseEntity<?> deleteComment(@PathVariable("slug") String slug, @PathVariable("id") long commentId,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var articleRecord = this.dsl.select(ARTICLE.ID, ARTICLE.USER_ID)
-			.from(ARTICLE)
-			.where(ARTICLE.SLUG.eq(slug))
-			.fetchOne();
+		var articleRecord = this.dsl.select(ARTICLE.ID).from(ARTICLE).where(ARTICLE.SLUG.eq(slug)).fetchOne();
 
 		if (articleRecord == null) {
 			return ResponseEntity.notFound().build();
@@ -125,7 +125,7 @@ public class CommentsController {
 			return ResponseEntity.notFound().build();
 		}
 
-		if (user.getId() != articleRecord.get(ARTICLE.USER_ID) && user.getId() != commentRecord.get(COMMENT.USER_ID)) {
+		if (user.getId() != commentRecord.get(COMMENT.USER_ID)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 

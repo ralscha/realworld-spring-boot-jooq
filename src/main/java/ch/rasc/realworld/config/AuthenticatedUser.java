@@ -6,11 +6,7 @@ public class AuthenticatedUser {
 
 	private final long id;
 
-	private final String email;
-
 	private final String username;
-
-	private final String password;
 
 	private final String bio;
 
@@ -18,9 +14,7 @@ public class AuthenticatedUser {
 
 	public AuthenticatedUser(AppUserRecord record) {
 		this.id = record.getId();
-		this.email = record.getEmail();
 		this.username = record.getUsername();
-		this.password = record.getPassword();
 		this.bio = record.getBio();
 		this.image = record.getImage();
 	}
@@ -29,16 +23,8 @@ public class AuthenticatedUser {
 		return this.id;
 	}
 
-	public String getEmail() {
-		return this.email;
-	}
-
 	public String getUsername() {
 		return this.username;
-	}
-
-	public String getPassword() {
-		return this.password;
 	}
 
 	public String getBio() {

@@ -35,10 +35,8 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		boolean following = user != null && this.dsl.selectCount()
-			.from(FOLLOW)
-			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-			.fetchOne(0, int.class) == 1;
+		boolean following = user != null && this.dsl.fetchExists(FOLLOW,
+				FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())));
 
 		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
 
@@ -54,15 +52,13 @@ public class ProfileController {
 			return ResponseEntity.notFound().build();
 		}
 
-		this.dsl.insertInto(FOLLOW, FOLLOW.USER_ID, FOLLOW.FOLLOW_ID)
-			.values(user.getId(), userRecord.getId())
-			.onDuplicateKeyIgnore()
-			.execute();
-
-		boolean following = this.dsl.selectCount()
-			.from(FOLLOW)
-			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-			.fetchOne(0, int.class) == 1;
+		boolean following = user.getId() != userRecord.getId();
+		if (following) {
+			this.dsl.insertInto(FOLLOW, FOLLOW.USER_ID, FOLLOW.FOLLOW_ID)
+				.values(user.getId(), userRecord.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		}
 
 		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
 
@@ -81,12 +77,7 @@ public class ProfileController {
 			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
 			.execute();
 
-		boolean following = this.dsl.selectCount()
-			.from(FOLLOW)
-			.where(FOLLOW.USER_ID.eq(user.getId()).and(FOLLOW.FOLLOW_ID.eq(userRecord.getId())))
-			.fetchOne(0, int.class) == 1;
-
-		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), following);
+		Profile profile = new Profile(userRecord.getUsername(), userRecord.getBio(), userRecord.getImage(), false);
 
 		return ResponseEntity.ok(Map.of("profile", profile));
 	}

@@ -69,19 +69,19 @@ public class AppUser extends TableImpl<AppUserRecord> {
 	 * The column <code>APP_USER.USERNAME</code>.
 	 */
 	public final TableField<AppUserRecord, String> USERNAME = createField(DSL.name("USERNAME"),
-			SQLDataType.VARCHAR(255), this, "");
+			SQLDataType.VARCHAR(255).nullable(false), this, "");
 
 	/**
 	 * The column <code>APP_USER.PASSWORD</code>.
 	 */
 	public final TableField<AppUserRecord, String> PASSWORD = createField(DSL.name("PASSWORD"),
-			SQLDataType.VARCHAR(255), this, "");
+			SQLDataType.VARCHAR(255).nullable(false), this, "");
 
 	/**
 	 * The column <code>APP_USER.EMAIL</code>.
 	 */
-	public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("EMAIL"), SQLDataType.VARCHAR(255),
-			this, "");
+	public final TableField<AppUserRecord, String> EMAIL = createField(DSL.name("EMAIL"),
+			SQLDataType.VARCHAR(255).nullable(false), this, "");
 
 	/**
 	 * The column <code>APP_USER.BIO</code>.

@@ -69,6 +69,9 @@ public class Keys {
 	public static final UniqueKey<TagRecord> CONSTRAINT_1 = Internal.createUniqueKey(Tag.TAG, DSL.name("CONSTRAINT_1"),
 			new TableField[] { Tag.TAG.ID }, true);
 
+	public static final UniqueKey<TagRecord> TAG_NAME_UNIQUE = Internal.createUniqueKey(Tag.TAG,
+			DSL.name("TAG_NAME_UNIQUE"), new TableField[] { Tag.TAG.NAME }, true);
+
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------

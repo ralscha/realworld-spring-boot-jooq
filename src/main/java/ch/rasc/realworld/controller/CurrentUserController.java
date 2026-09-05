@@ -26,6 +26,8 @@ import ch.rasc.realworld.config.JwtService;
 import ch.rasc.realworld.dto.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @RestController
 public class CurrentUserController {
@@ -58,17 +60,13 @@ public class CurrentUserController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		if (updateUserParam.username != null && this.dsl.selectCount()
-			.from(APP_USER)
-			.where(APP_USER.USERNAME.eq(updateUserParam.username).and(APP_USER.ID.ne(currentUser.getId())))
-			.fetchOne(0, int.class) == 1) {
+		if (updateUserParam.username != null && this.dsl.fetchExists(APP_USER,
+				APP_USER.USERNAME.eq(updateUserParam.username).and(APP_USER.ID.ne(currentUser.getId())))) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
-		if (updateUserParam.email != null && this.dsl.selectCount()
-			.from(APP_USER)
-			.where(APP_USER.EMAIL.eq(updateUserParam.email).and(APP_USER.ID.ne(currentUser.getId())))
-			.fetchOne(0, int.class) == 1) {
+		if (updateUserParam.email != null && this.dsl.fetchExists(APP_USER,
+				APP_USER.EMAIL.eq(updateUserParam.email).and(APP_USER.ID.ne(currentUser.getId())))) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 
@@ -86,10 +84,10 @@ public class CurrentUserController {
 		if (updateUserParam.username != null) {
 			userRecord.setUsername(updateUserParam.username);
 		}
-		if (updateUserParam.bio != null) {
+		if (updateUserParam.bioPresent) {
 			userRecord.setBio(updateUserParam.bio);
 		}
-		if (updateUserParam.image != null) {
+		if (updateUserParam.imagePresent) {
 			userRecord.setImage(updateUserParam.image);
 		}
 		userRecord.update();
@@ -102,18 +100,49 @@ public class CurrentUserController {
 }
 
 @JsonRootName("user")
-@JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@JsonAutoDetect(fieldVisibility = Visibility.NONE, setterVisibility = Visibility.ANY)
 class UpdateUserParam {
 
 	@Email(message = "should be an email")
+	@Pattern(regexp = "(?s).*\\S.*", message = "can't be empty")
+	@Size(max = 255, message = "is too long")
 	String email;
 
+	@Pattern(regexp = "(?s).*\\S.*", message = "can't be empty")
 	String password;
 
+	@Pattern(regexp = "(?s).*\\S.*", message = "can't be empty")
+	@Size(max = 255, message = "is too long")
 	String username;
 
 	String bio;
 
 	String image;
+
+	boolean bioPresent;
+
+	boolean imagePresent;
+
+	void setEmail(String email) {
+		this.email = email;
+	}
+
+	void setPassword(String password) {
+		this.password = password;
+	}
+
+	void setUsername(String username) {
+		this.username = username;
+	}
+
+	void setBio(String bio) {
+		this.bio = bio;
+		this.bioPresent = true;
+	}
+
+	void setImage(String image) {
+		this.image = image;
+		this.imagePresent = true;
+	}
 
 }

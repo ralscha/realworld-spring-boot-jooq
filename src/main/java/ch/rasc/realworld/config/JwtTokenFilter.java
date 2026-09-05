@@ -23,9 +23,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
 
-	private final static String AUTHORIZATION_HEADER = "Authorization";
+	private static final String AUTHORIZATION_HEADER = "Authorization";
 
-	private final static String TOKEN = "Token";
+	private static final String TOKEN_PREFIX = "Token ";
 
 	public JwtTokenFilter(DSLContext dsl, JwtService jwtService) {
 		this.dsl = dsl;
@@ -37,7 +37,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String jwt = resolveToken(request);
-		if (jwt != null) {
+		if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			Long userId = this.jwtService.getSubFromToken(jwt);
 			if (userId != null) {
 				var record = this.dsl.selectFrom(APP_USER).where(APP_USER.ID.eq(userId)).fetchOne();
@@ -56,8 +56,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	@SuppressWarnings("null")
 	private static String resolveToken(HttpServletRequest request) {
 		String token = request.getHeader(AUTHORIZATION_HEADER);
-		if (StringUtils.hasText(token) && token.startsWith(TOKEN)) {
-			return token.substring(TOKEN.length() + 1);
+		if (StringUtils.hasText(token) && token.startsWith(TOKEN_PREFIX)) {
+			String jwt = token.substring(TOKEN_PREFIX.length()).trim();
+			return StringUtils.hasText(jwt) ? jwt : null;
 		}
 		return null;
 	}

@@ -9,7 +9,9 @@ import ch.rasc.realworld.db.tables.Article.ArticlePath;
 import ch.rasc.realworld.db.tables.ArticleTag.ArticleTagPath;
 import ch.rasc.realworld.db.tables.records.TagRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -64,7 +66,8 @@ public class Tag extends TableImpl<TagRecord> {
 	/**
 	 * The column <code>TAG.NAME</code>.
 	 */
-	public final TableField<TagRecord, String> NAME = createField(DSL.name("NAME"), SQLDataType.VARCHAR(255), this, "");
+	public final TableField<TagRecord, String> NAME = createField(DSL.name("NAME"),
+			SQLDataType.VARCHAR(255).nullable(false), this, "");
 
 	private Tag(Name alias, Table<TagRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
@@ -146,6 +149,11 @@ public class Tag extends TableImpl<TagRecord> {
 	@Override
 	public UniqueKey<TagRecord> getPrimaryKey() {
 		return Keys.CONSTRAINT_1;
+	}
+
+	@Override
+	public List<UniqueKey<TagRecord>> getUniqueKeys() {
+		return Arrays.asList(Keys.TAG_NAME_UNIQUE);
 	}
 
 	private transient ArticleTagPath _articleTag;

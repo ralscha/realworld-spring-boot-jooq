@@ -1,10 +1,10 @@
 package ch.rasc.realworld.config;
 
-import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -18,18 +18,25 @@ public class JwtService {
 
 	private final JWTVerifier verifier;
 
-	@Autowired
-	public JwtService() {
-		byte[] secret = new byte[64];
-		new SecureRandom().nextBytes(secret);
-		this.algorithm = Algorithm.HMAC512(secret);
+	private final Duration expiration;
+
+	public JwtService(@Value("${realworld.jwt.secret}") String secret,
+			@Value("${realworld.jwt.expiration:PT24H}") Duration expiration) {
+		if (secret.length() < 32) {
+			throw new IllegalArgumentException("realworld.jwt.secret must contain at least 32 characters");
+		}
+		if (expiration.isNegative() || expiration.isZero()) {
+			throw new IllegalArgumentException("realworld.jwt.expiration must be positive");
+		}
+		this.algorithm = Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8));
 		this.verifier = JWT.require(this.algorithm).build();
+		this.expiration = expiration;
 	}
 
 	public String toToken(long userId) {
 		return JWT.create()
 			.withSubject(Long.toString(userId))
-			.withExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+			.withExpiresAt(Instant.now().plus(this.expiration))
 			.sign(this.algorithm);
 	}
 

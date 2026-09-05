@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -33,11 +34,12 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 import ch.rasc.realworld.Util;
 import ch.rasc.realworld.config.AuthenticatedUser;
-import ch.rasc.realworld.db.tables.records.ArticleRecord;
 import ch.rasc.realworld.dto.Article;
 import ch.rasc.realworld.dto.ArticleDataList;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 
 @RestController
 public class ArticlesController {
@@ -49,6 +51,7 @@ public class ArticlesController {
 	}
 
 	@PostMapping("/articles")
+	@Transactional
 	public ResponseEntity<?> createArticle(@Valid @RequestBody NewArticleParam newArticleParam,
 			BindingResult bindingResult, @AuthenticationPrincipal AuthenticatedUser user) {
 
@@ -63,48 +66,35 @@ public class ArticlesController {
 		LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
 		articleRecord.setCreatedAt(now);
 		articleRecord.setUpdatedAt(now);
-		articleRecord.setSlug(Util.toSlug(newArticleParam.title));
+		articleRecord.setSlug(Util.uniqueSlug(this.dsl, newArticleParam.title, null));
 		articleRecord.setUserId(user.getId());
 		articleRecord.store();
 
 		if (newArticleParam.tagList != null) {
-			for (String tag : newArticleParam.tagList) {
-				var tagRecord = this.dsl.select(TAG.ID).from(TAG).where(TAG.NAME.eq(tag)).fetchOne();
-				if (tagRecord == null) {
-					var newTagRecord = this.dsl.newRecord(TAG);
-					newTagRecord.setName(tag);
-					newTagRecord.store();
-					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
-						.values(articleRecord.getId(), newTagRecord.getId())
-						.execute();
-				}
-				else {
-					this.dsl.insertInto(ARTICLE_TAG, ARTICLE_TAG.ARTICLE_ID, ARTICLE_TAG.TAG_ID)
-						.values(articleRecord.getId(), tagRecord.get(TAG.ID))
-						.execute();
-				}
-			}
+			Util.setArticleTags(this.dsl, articleRecord.getId(), newArticleParam.tagList);
 		}
 
-		return ResponseEntity.ok(Map.of("article", Util.getArticle(this.dsl, articleRecord.getId(), user.getId())));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(Map.of("article", Util.getArticle(this.dsl, articleRecord.getId(), user.getId())));
 	}
 
 	@GetMapping(path = "/articles/feed")
-	public ResponseEntity<ArticleDataList> getFeed(@RequestParam(value = "offset", defaultValue = "0") int offset,
-			@RequestParam(value = "limit", defaultValue = "20") int limit,
+	public ResponseEntity<ArticleDataList> getFeed(
+			@RequestParam(value = "offset", defaultValue = "0") @Min(0) int offset,
+			@RequestParam(value = "limit", defaultValue = "20") @Min(1) int limit,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
 		var followUserIds = this.dsl.select(FOLLOW.FOLLOW_ID)
 			.from(FOLLOW)
 			.where(FOLLOW.USER_ID.eq(user.getId()))
-			.fetch();
+			.fetchSet(FOLLOW.FOLLOW_ID);
 		if (followUserIds.isEmpty()) {
 			return ResponseEntity.ok(new ArticleDataList(List.of(), 0));
 		}
 
 		var articlesRecords = this.dsl.selectFrom(ARTICLE)
 			.where(ARTICLE.USER_ID.in(followUserIds))
-			.orderBy(ARTICLE.CREATED_AT.desc())
+			.orderBy(ARTICLE.CREATED_AT.desc(), ARTICLE.ID.desc())
 			.offset(offset)
 			.limit(limit)
 			.fetch();
@@ -116,22 +106,21 @@ public class ArticlesController {
 
 		List<Article> articles = new ArrayList<>();
 		for (var articleRecord : articlesRecords) {
-			articles.add(Util.getArticle(this.dsl, articleRecord, user.getId()));
+			articles.add(Util.getArticleSummary(this.dsl, articleRecord, user.getId()));
 		}
 		return ResponseEntity.ok(new ArticleDataList(articles, articlesCount));
 
 	}
 
 	@GetMapping("/articles")
-	public ResponseEntity<ArticleDataList> getArticles(@RequestParam(value = "offset", defaultValue = "0") int offset,
-			@RequestParam(value = "limit", defaultValue = "20") int limit,
+	public ResponseEntity<ArticleDataList> getArticles(
+			@RequestParam(value = "offset", defaultValue = "0") @Min(0) int offset,
+			@RequestParam(value = "limit", defaultValue = "20") @Min(1) int limit,
 			@RequestParam(value = "tag", required = false) String tag,
 			@RequestParam(value = "favorited", required = false) String favoritedBy,
 			@RequestParam(value = "author", required = false) String author,
 			@AuthenticationPrincipal AuthenticatedUser user) {
 
-		var articlesQuery = this.dsl.select(ARTICLE.fields()).from(ARTICLE);
-		var articlesCountQuery = this.dsl.selectCount().from(ARTICLE);
 		List<Condition> filters = new ArrayList<>();
 
 		if (StringUtils.hasText(tag)) {
@@ -156,11 +145,14 @@ public class ArticlesController {
 				.where(APP_USER.ID.eq(ARTICLE.USER_ID).and(APP_USER.USERNAME.eq(author)))));
 		}
 
-		var articlesRecords = filters.isEmpty()
-				? articlesQuery.orderBy(ARTICLE.CREATED_AT.desc()).offset(offset).limit(limit).fetch()
-				: articlesQuery.where(filters).orderBy(ARTICLE.CREATED_AT.desc()).offset(offset).limit(limit).fetch();
-		int articlesCount = filters.isEmpty() ? articlesCountQuery.fetchOne(0, int.class)
-				: articlesCountQuery.where(filters).fetchOne(0, int.class);
+		Condition condition = DSL.and(filters);
+		var articlesRecords = this.dsl.selectFrom(ARTICLE)
+			.where(condition)
+			.orderBy(ARTICLE.CREATED_AT.desc(), ARTICLE.ID.desc())
+			.offset(offset)
+			.limit(limit)
+			.fetch();
+		int articlesCount = this.dsl.fetchCount(ARTICLE, condition);
 
 		if (articlesCount == 0) {
 			return ResponseEntity.ok(new ArticleDataList(List.of(), articlesCount));
@@ -168,11 +160,7 @@ public class ArticlesController {
 
 		List<Article> articles = new ArrayList<>();
 		for (var articleRecord : articlesRecords) {
-			ArticleRecord record = new ArticleRecord(articleRecord.get(ARTICLE.ID), articleRecord.get(ARTICLE.USER_ID),
-					articleRecord.get(ARTICLE.SLUG), articleRecord.get(ARTICLE.TITLE),
-					articleRecord.get(ARTICLE.DESCRIPTION), articleRecord.get(ARTICLE.BODY),
-					articleRecord.get(ARTICLE.CREATED_AT), articleRecord.get(ARTICLE.UPDATED_AT));
-			articles.add(Util.getArticle(this.dsl, record, user != null ? user.getId() : -1));
+			articles.add(Util.getArticleSummary(this.dsl, articleRecord, user != null ? user.getId() : -1));
 		}
 		return ResponseEntity.ok(new ArticleDataList(articles, articlesCount));
 	}
@@ -184,6 +172,7 @@ public class ArticlesController {
 class NewArticleParam {
 
 	@NotBlank(message = "can't be empty")
+	@Size(max = 255, message = "is too long")
 	String title;
 
 	@NotBlank(message = "can't be empty")
@@ -192,6 +181,6 @@ class NewArticleParam {
 	@NotBlank(message = "can't be empty")
 	String body;
 
-	String[] tagList;
+	List<@NotBlank(message = "can't be empty") @Size(max = 255, message = "is too long") String> tagList;
 
 }

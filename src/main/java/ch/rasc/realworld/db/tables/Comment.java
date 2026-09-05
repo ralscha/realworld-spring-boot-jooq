@@ -67,7 +67,8 @@ public class Comment extends TableImpl<CommentRecord> {
 	/**
 	 * The column <code>COMMENT.BODY</code>.
 	 */
-	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"), SQLDataType.CLOB, this, "");
+	public final TableField<CommentRecord, String> BODY = createField(DSL.name("BODY"),
+			SQLDataType.CLOB.nullable(false), this, "");
 
 	/**
 	 * The column <code>COMMENT.ARTICLE_ID</code>.

@@ -22,6 +22,7 @@ import ch.rasc.realworld.dto.User;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @RestController
 public class UsersController {
@@ -46,17 +47,11 @@ public class UsersController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Util.toError(bindingResult));
 		}
 
-		if (this.dsl.selectCount()
-			.from(APP_USER)
-			.where(APP_USER.USERNAME.eq(registerParam.username()))
-			.fetchOne(0, int.class) == 1) {
+		if (this.dsl.fetchExists(APP_USER, APP_USER.USERNAME.eq(registerParam.username()))) {
 			bindingResult.rejectValue("username", "DUPLICATED", "duplicated username");
 		}
 
-		if (this.dsl.selectCount()
-			.from(APP_USER)
-			.where(APP_USER.EMAIL.eq(registerParam.email()))
-			.fetchOne(0, int.class) == 1) {
+		if (this.dsl.fetchExists(APP_USER, APP_USER.EMAIL.eq(registerParam.email()))) {
 			bindingResult.rejectValue("email", "DUPLICATED", "duplicated email");
 		}
 
@@ -99,12 +94,15 @@ public class UsersController {
 }
 
 @JsonRootName("user")
-record LoginParam(@NotBlank(message = "can't be empty") @Email(message = "should be an email") String email,
-		@NotBlank(message = "can't be empty") String password) {
+record LoginParam(@NotBlank(message = "can't be empty") @Email(message = "should be an email") @Size(max = 255,
+		message = "is too long") String email, @NotBlank(message = "can't be empty") String password) {
 }
 
 @JsonRootName("user")
-record RegisterParam(@NotBlank(message = "can't be empty") @Email(message = "should be an email") String email,
-		String bio, String image, @NotBlank(message = "can't be empty") String username,
+record RegisterParam(
+		@NotBlank(message = "can't be empty") @Email(message = "should be an email") @Size(max = 255,
+				message = "is too long") String email,
+		String bio, String image,
+		@NotBlank(message = "can't be empty") @Size(max = 255, message = "is too long") String username,
 		@NotBlank(message = "can't be empty") String password) {
 }

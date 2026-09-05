@@ -11,7 +11,7 @@
   <artifactId>realworld</artifactId>
   <version>0.0.1</version>
   <name>realworld</name>
-  <description>Realdworld.io Server implementation with Spring Boot</description>
+  <description>RealWorld.io server implementation with Spring Boot</description>
 
   <properties>
     <java.version>25</java.version>
@@ -70,6 +70,11 @@
           <artifactId>mockito-junit-jupiter</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
